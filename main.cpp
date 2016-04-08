@@ -56,7 +56,7 @@ float deltaTime = 0.0;
 int thisTime = 0;
 int lastTime = 0;
 
-void UpdateBackground(){
+void UpdateBackground(float deltaTime){
 
 	b1pos_Y +=(bkgdSpeed *1)* deltaTime;
 	bkgd1Pos.y = (int)(b1pos_Y + 0.5f);
@@ -75,6 +75,83 @@ void UpdateBackground(){
 		b2pos_Y = bkgd2Pos.y;
 	}
 }
+
+//Analog joystick dead zone
+const int JOYSTICK_DEAD_ZONE = 8000;
+
+//joystick direction vars
+float xDir, yDir;
+
+//cursor float vars for movement
+float pos_X, pos_Y;
+
+//create SDL Rectangle for the 2 player graphic
+SDL_Rect mousePos, activePos;
+
+//var from cursor speed
+int mouseSpeed = 400;
+
+void moveCursor(const SDL_ControllerAxisEvent event) {
+
+	if(event.which == 0){
+		if(event.axis == 0) {
+
+			if(event.value < - JOYSTICK_DEAD_ZONE){
+				xDir = -1.0f;
+			}else if (event.value > JOYSTICK_DEAD_ZONE){
+				xDir = 1.0f;
+			} else {
+				xDir = 0.0f;
+			}
+		}
+
+		if(event.axis == 1) {
+
+				if(event.value < - JOYSTICK_DEAD_ZONE){
+					yDir = -1.0f;
+				}else if (event.value > JOYSTICK_DEAD_ZONE){
+					yDir = 1.0f;
+				} else {
+					yDir = 0.0f;
+				}
+			}
+		}
+	}
+
+void UpdateCursor(float deltaTime){
+
+	pos_X += (mouseSpeed * xDir) * deltaTime;
+	pos_Y += (mouseSpeed * yDir) * deltaTime;
+
+	mousePos.x = (int) (pos_X + 0.5f);
+	mousePos.y = (int) (pos_Y + 0.5f);
+
+	activePos.x = mousePos.x;
+	activePos.y = mousePos.y;
+
+	if(mousePos.x < 0){
+		mousePos.x = 0;
+		pos_X = mousePos.x;
+	}
+
+	if(mousePos.x > 1024 - mousePos.w){
+		mousePos.x = 1024 - mousePos.w;
+		pos_X = mousePos.x;
+	}
+
+	if(mousePos.y < 0){
+		mousePos.y = 0;
+		pos_Y = mousePos.y;
+	}
+
+	if(mousePos.y > 768 - mousePos.h){
+		mousePos.y = 768 - mousePos.h;
+		pos_Y = mousePos.y;
+	}
+}
+
+bool InstructionsOver = false, StartGameOver = false,
+BackStoryOver = false, QuitOver = false, MenuOver = false;
 
 int main(int argc, char* argv[]){
 
@@ -124,8 +201,6 @@ int main(int argc, char* argv[]){
 
 	SDL_FreeSurface(surface);
 
-	SDL_Rect mousePos, activePos;
-
 	mousePos.x = 0;
 	mousePos.y = 0;
 	mousePos.w = 29;
@@ -135,8 +210,6 @@ int main(int argc, char* argv[]){
 	activePos.y = 10;
 	activePos.w = 10;
 	activePos.h = 10;
-
-	int mouseSpeed = 400;
 
 	surface = IMG_Load((images_dir + "MainMenu.png").c_str());
 
@@ -237,20 +310,41 @@ int main(int argc, char* argv[]){
 	QuitPos.w = 126;
 	QuitPos.h = 58;
 
-	surface = IMG_Load((images_dir + "MainMenu.png").c_str());
+	surface = IMG_Load((images_dir + "InsructionsText.png").c_str());
 
-	SDL_Texture *mainmenu;
+	SDL_Texture *InsructionsText;
 
-	mainmenu = SDL_CreateTextureFromSurface(renderer, surface);
+	InsructionsText = SDL_CreateTextureFromSurface(renderer, surface);
 
 	SDL_FreeSurface(surface);
 
-	SDL_Rect menuPos;
+	SDL_Rect InsructionsTextPos;
 
-	menuPos.x = 350;
-	menuPos.y = 75;
-	menuPos.w = 331;
-	menuPos.h = 64;
+	InsructionsTextPos.x = 0;
+	InsructionsTextPos.y = 0;
+	InsructionsTextPos.w = 1013;
+	InsructionsTextPos.h = 431;
+
+	surface = IMG_Load((images_dir + "Menubutton.png").c_str());
+
+	SDL_Texture *Menubutton;
+
+	Menubutton = SDL_CreateTextureFromSurface(renderer, surface);
+
+	surface = IMG_Load((images_dir + "MenubuttonO.png").c_str());
+
+	SDL_Texture *MenubuttonO;
+
+	MenubuttonO = SDL_CreateTextureFromSurface(renderer, surface);
+
+	SDL_FreeSurface(surface);
+
+	SDL_Rect MenubuttonPos;
+
+	MenubuttonPos.x = 100;
+	MenubuttonPos.y = 700;
+	MenubuttonPos.w = 106;
+	MenubuttonPos.h = 32;
 
 	SDL_GameController* gGameController = NULL;
 
@@ -260,7 +354,7 @@ int main(int argc, char* argv[]){
 
 	SDL_Event e;
 
-	enum GameState{MENU, INSTRUCTIONS, BACKSTORY, STARGAME,WIN,LOSE};
+	enum GameState{MENU, INSTRUCTIONS, BACKSTORY, STARTGAME, WIN,LOSE};
 
 	GameState gameState = MENU;
 
@@ -290,9 +384,59 @@ int main(int argc, char* argv[]){
 						break;
 					}
 
+					switch(e.type)
+					{
+					case SDL_CONTROLLERBUTTONDOWN:
+						if(e.cdevice.which == 0)
+						{
+							if(e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+							{
+								if(StartGameOver)
+								{
+									menu = false;
+									gameState = STARTGAME;
+									StartGameOver = false;
+								}
+
+								if(InstructionsOver)
+								{
+									menu = false;
+									gameState = INSTRUCTIONS;
+									InstructionsOver = false;
+								}
+
+								if(BackStoryOver)
+								{
+									menu = false;
+									gameState = BACKSTORY;
+									BackStoryOver = false;
+								}
+
+								if(QuitOver)
+								{
+									menu = false;
+									quit = true;
+									QuitOver = false;
+								}
+							}
+						}
+						break;
+
+					case SDL_CONTROLLERAXISMOTION:
+
+						moveCursor(e.caxis);
+						break;
+					}
 				}
 
-				UpdateBackground();
+				UpdateBackground(deltaTime);
+
+				UpdateCursor(deltaTime);
+
+				InstructionsOver = SDL_HasIntersection(&activePos, &InstructionsPos);
+				BackStoryOver = SDL_HasIntersection(&activePos, &BackStoryPos);
+				StartGameOver = SDL_HasIntersection(&activePos, &StartGamePos);
+				QuitOver = SDL_HasIntersection(&activePos, &QuitPos);
 
 				SDL_RenderClear(renderer);
 
@@ -302,19 +446,99 @@ int main(int argc, char* argv[]){
 
 				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
 
-				SDL_RenderCopy(renderer, StartGame, NULL, &StartGamePos);
+				if(StartGameOver)
+				{
+					SDL_RenderCopy(renderer, StartGameO, NULL, &StartGamePos);
+				}
+				else
+				{
+					SDL_RenderCopy(renderer, StartGame, NULL, &StartGamePos);
+				}
 
-				SDL_RenderCopy(renderer, Instructions, NULL, &InstructionsPos);
+				if(InstructionsOver)
+				{
+					SDL_RenderCopy(renderer, InstructionsO, NULL, &InstructionsPos);
+				}
+				else
+				{
+					SDL_RenderCopy(renderer, Instructions, NULL, &InstructionsPos);
+				}
 
-				SDL_RenderCopy(renderer, BackStory, NULL, &BackStoryPos);
+				if(BackStoryOver)
+				{
+					SDL_RenderCopy(renderer, BackStoryO, NULL, &BackStoryPos);
+				}
+				else
+				{
+					SDL_RenderCopy(renderer, BackStory, NULL, &BackStoryPos);
+				}
 
-				SDL_RenderCopy(renderer, Quit, NULL, &QuitPos);
+				if(QuitOver)
+				{
+					SDL_RenderCopy(renderer, QuitO, NULL, &QuitPos);
+				}
+				else
+				{
+					SDL_RenderCopy(renderer, Quit, NULL, &QuitPos);
+				}
+
 
 				SDL_RenderCopy(renderer, mouse, NULL, &mousePos);
 
 				SDL_RenderPresent(renderer);
+			}
+			break;
 
-				//SDL_RenderCopy(renderer, title, NULL, &titlePos);
+		case STARTGAME:
+			startgame = true;
+
+			while(startgame)
+			{
+				thisTime = SDL_GetTicks();
+				deltaTime = (float)(thisTime - lastTime)/1000;
+				lastTime = thisTime;
+
+				if(SDL_PollEvent(&e))
+				{
+					if(e.type == SDL_QUIT)
+					{
+						quit = true;
+						menu = false;
+						break;
+					}
+
+					switch(e.type)
+					{
+					case SDL_CONTROLLERBUTTONDOWN:
+						if(e.cdevice.which == 0)
+						{
+							if(e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+							{
+
+							}
+						}
+						break;
+
+					case SDL_CONTROLLERAXISMOTION:
+
+						moveCursor(e.caxis);
+						break;
+					}
+				}
+
+				UpdateBackground(deltaTime);
+
+				UpdateCursor(deltaTime);
+
+				SDL_RenderClear(renderer);
+
+				SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
+
+				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
+
+				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
+
+				SDL_RenderPresent(renderer);
 			}
 			break;
 
@@ -332,19 +556,60 @@ int main(int argc, char* argv[]){
 					if(e.type == SDL_QUIT)
 					{
 						quit = true;
-						instructions = false;
+						menu = false;
 						break;
 					}
 
+					switch(e.type)
+					{
+					case SDL_CONTROLLERBUTTONDOWN:
+						if(e.cdevice.which == 0)
+						{
+							if(e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+							{
+								if(MenuOver)
+								{
+									instructions = false;
+									gameState = MENU;
+									StartGameOver = false;
+								}
+
+							}
+						}
+						break;
+
+					case SDL_CONTROLLERAXISMOTION:
+
+						moveCursor(e.caxis);
+						break;
+					}
 				}
 
-				UpdateBackground();
+				UpdateBackground(deltaTime);
+
+				UpdateCursor(deltaTime);
+
+				MenuOver = SDL_HasIntersection(&activePos, &MenubuttonPos);
 
 				SDL_RenderClear(renderer);
 
 				SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
 
 				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
+
+				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
+
+				SDL_RenderCopy(renderer, InsructionsText, NULL, &InsructionsTextPos);
+
+				if(MenuOver)
+				{
+					SDL_RenderCopy(renderer, MenubuttonO, NULL, &MenubuttonPos);
+				}
+				else
+				{
+					SDL_RenderCopy(renderer, Menubutton, NULL, &MenubuttonPos);
+				}
+
 
 				SDL_RenderCopy(renderer, mouse, NULL, &mousePos);
 
@@ -357,70 +622,157 @@ int main(int argc, char* argv[]){
 
 			while(backstory)
 			{
+				thisTime = SDL_GetTicks();
+				deltaTime = (float)(thisTime - lastTime)/1000;
+				lastTime = thisTime;
+
 				if(SDL_PollEvent(&e))
 				{
 					if(e.type == SDL_QUIT)
 					{
 						quit = true;
-						backstory = false;
+						menu = false;
 						break;
 					}
 
-				}
-			}
-			break;
-
-		case STARGAME:
-			startgame = true;
-
-			while(startgame)
-			{
-				if(SDL_PollEvent(&e))
-				{
-					if(e.type == SDL_QUIT)
+					switch(e.type)
 					{
-						quit = true;
-						startgame = false;
+					case SDL_CONTROLLERBUTTONDOWN:
+						if(e.cdevice.which == 0)
+						{
+							if(e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+							{
+
+							}
+						}
+						break;
+
+					case SDL_CONTROLLERAXISMOTION:
+
+						moveCursor(e.caxis);
 						break;
 					}
-
 				}
+
+				UpdateBackground(deltaTime);
+
+				UpdateCursor(deltaTime);
+
+				SDL_RenderClear(renderer);
+
+				SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
+
+				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
+
+				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
+
+				SDL_RenderPresent(renderer);
 			}
 			break;
 
 		case WIN:
-			instructions = true;
+			win = true;
 
 			while(win)
 			{
+				thisTime = SDL_GetTicks();
+				deltaTime = (float)(thisTime - lastTime)/1000;
+				lastTime = thisTime;
+
 				if(SDL_PollEvent(&e))
 				{
 					if(e.type == SDL_QUIT)
 					{
 						quit = true;
-						win = false;
+						menu = false;
 						break;
 					}
 
+					switch(e.type)
+					{
+					case SDL_CONTROLLERBUTTONDOWN:
+						if(e.cdevice.which == 0)
+						{
+							if(e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+							{
+
+							}
+						}
+						break;
+
+					case SDL_CONTROLLERAXISMOTION:
+
+						moveCursor(e.caxis);
+						break;
+					}
 				}
+
+				UpdateBackground(deltaTime);
+
+				UpdateCursor(deltaTime);
+
+				SDL_RenderClear(renderer);
+
+				SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
+
+				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
+
+				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
+
+				SDL_RenderPresent(renderer);
 			}
 			break;
 
 		case LOSE:
-			instructions = true;
+			lose = true;
 
 			while(lose)
 			{
+				thisTime = SDL_GetTicks();
+				deltaTime = (float)(thisTime - lastTime)/1000;
+				lastTime = thisTime;
+
 				if(SDL_PollEvent(&e))
 				{
 					if(e.type == SDL_QUIT)
 					{
 						quit = true;
-						lose = false;
+						menu = false;
 						break;
 					}
 
+					switch(e.type)
+					{
+					case SDL_CONTROLLERBUTTONDOWN:
+						if(e.cdevice.which == 0)
+						{
+							if(e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+							{
+
+							}
+						}
+						break;
+
+					case SDL_CONTROLLERAXISMOTION:
+
+						moveCursor(e.caxis);
+						break;
+					}
 				}
+
+				UpdateBackground(deltaTime);
+
+				UpdateCursor(deltaTime);
+
+				SDL_RenderClear(renderer);
+
+				SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
+
+				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
+
+				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
+
+				SDL_RenderPresent(renderer);
 			}
 			break;
 		}
