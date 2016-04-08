@@ -45,6 +45,8 @@ string audio_dir = currentWorkingDirectory + "/final-game/";
 
 #endif
 
+#include "player.h"
+
 SDL_Rect bkgd1Pos, bkgd2Pos;
 
 int bkgdSpeed = 100;
@@ -76,19 +78,14 @@ void UpdateBackground(float deltaTime){
 	}
 }
 
-//Analog joystick dead zone
 const int JOYSTICK_DEAD_ZONE = 8000;
 
-//joystick direction vars
 float xDir, yDir;
 
-//cursor float vars for movement
 float pos_X, pos_Y;
 
-//create SDL Rectangle for the 2 player graphic
 SDL_Rect mousePos, activePos;
 
-//var from cursor speed
 int mouseSpeed = 400;
 
 void moveCursor(const SDL_ControllerAxisEvent event) {
@@ -150,8 +147,8 @@ void UpdateCursor(float deltaTime){
 	}
 }
 
-bool InstructionsOver = false, StartGameOver = false,
-BackStoryOver = false, QuitOver = false, MenuOver = false;
+bool InstructionsOver = false, instructionsover = false, StartGameOver = false, startgameover = false,
+BackStoryOver = false, backstoryover = false, QuitOver = false, MenuOver = false;
 
 int main(int argc, char* argv[]){
 
@@ -310,7 +307,7 @@ int main(int argc, char* argv[]){
 	QuitPos.w = 126;
 	QuitPos.h = 58;
 
-	surface = IMG_Load((images_dir + "InsructionsText.png").c_str());
+	surface = IMG_Load((images_dir + "InstructionsText.png").c_str());
 
 	SDL_Texture *InsructionsText;
 
@@ -321,9 +318,54 @@ int main(int argc, char* argv[]){
 	SDL_Rect InsructionsTextPos;
 
 	InsructionsTextPos.x = 0;
-	InsructionsTextPos.y = 0;
+	InsructionsTextPos.y = 200;
 	InsructionsTextPos.w = 1013;
 	InsructionsTextPos.h = 431;
+
+	surface = IMG_Load((images_dir + "BackStoryText.png").c_str());
+
+	SDL_Texture *BackStoryText;
+
+	BackStoryText = SDL_CreateTextureFromSurface(renderer, surface);
+
+	SDL_FreeSurface(surface);
+
+	SDL_Rect BackStoryTextPos;
+
+	BackStoryTextPos.x = 250;
+	BackStoryTextPos.y = 200;
+	BackStoryTextPos.w = 558;
+	BackStoryTextPos.h = 345;
+
+	surface = IMG_Load((images_dir + "WinText.png").c_str());
+
+	SDL_Texture *WinText;
+
+	WinText = SDL_CreateTextureFromSurface(renderer, surface);
+
+	SDL_FreeSurface(surface);
+
+	SDL_Rect WinTextPos;
+
+	WinTextPos.x = 350;
+	WinTextPos.y = 325;
+	WinTextPos.w = 357;
+	WinTextPos.h = 95;
+
+	surface = IMG_Load((images_dir + "LoseText.png").c_str());
+
+	SDL_Texture *LoseText;
+
+	LoseText = SDL_CreateTextureFromSurface(renderer, surface);
+
+	SDL_FreeSurface(surface);
+
+	SDL_Rect LoseTextPos;
+
+	LoseTextPos.x = 350;
+	LoseTextPos.y = 300;
+	LoseTextPos.w = 362;
+	LoseTextPos.h = 144;
 
 	surface = IMG_Load((images_dir + "Menubutton.png").c_str());
 
@@ -346,6 +388,69 @@ int main(int argc, char* argv[]){
 	MenubuttonPos.w = 106;
 	MenubuttonPos.h = 32;
 
+	surface = IMG_Load((images_dir + "BackStorybutton.png").c_str());
+
+	SDL_Texture *BackStorybutton;
+
+	BackStorybutton = SDL_CreateTextureFromSurface(renderer, surface);
+
+	surface = IMG_Load((images_dir + "BackStorybuttonO.png").c_str());
+
+	SDL_Texture *BackStorybuttonO;
+
+	BackStorybuttonO = SDL_CreateTextureFromSurface(renderer, surface);
+
+	SDL_FreeSurface(surface);
+
+	SDL_Rect BackStorybuttonPos;
+
+	BackStorybuttonPos.x = 400;
+	BackStorybuttonPos.y = 700;
+	BackStorybuttonPos.w = 186;
+	BackStorybuttonPos.h = 43;
+
+	surface = IMG_Load((images_dir + "InstructionsButton.png").c_str());
+
+	SDL_Texture *InstructionsButton;
+
+	InstructionsButton = SDL_CreateTextureFromSurface(renderer, surface);
+
+	surface = IMG_Load((images_dir + "InstructionsButtonO.png").c_str());
+
+	SDL_Texture *InstructionsButtonO;
+
+	InstructionsButtonO = SDL_CreateTextureFromSurface(renderer, surface);
+
+	SDL_FreeSurface(surface);
+
+	SDL_Rect InstructionsButtonPos;
+
+	InstructionsButtonPos.x = 400;
+	InstructionsButtonPos.y = 700;
+	InstructionsButtonPos.w = 221;
+	InstructionsButtonPos.h = 32;
+
+	surface = IMG_Load((images_dir + "StartGamebutton.png").c_str());
+
+	SDL_Texture *StartGamebutton;
+
+	StartGamebutton = SDL_CreateTextureFromSurface(renderer, surface);
+
+	surface = IMG_Load((images_dir + "StartGamebuttonO.png").c_str());
+
+	SDL_Texture *StartGamebuttonO;
+
+	StartGamebuttonO = SDL_CreateTextureFromSurface(renderer, surface);
+
+	SDL_FreeSurface(surface);
+
+	SDL_Rect StartGamebuttonPos;
+
+	StartGamebuttonPos.x = 750;
+	StartGamebuttonPos.y = 700;
+	StartGamebuttonPos.w = 212;
+	StartGamebuttonPos.h = 32;
+
 	SDL_GameController* gGameController = NULL;
 
 	gGameController = SDL_GameControllerOpen(0);
@@ -353,6 +458,8 @@ int main(int argc, char* argv[]){
 	SDL_GameControllerEventState(SDL_ENABLE);
 
 	SDL_Event e;
+
+	//Ship Ship1 = Ship(renderer, 0, images_dir.c_str(), audio_dir.c_str(), 400.0,250.0);
 
 	enum GameState{MENU, INSTRUCTIONS, BACKSTORY, STARTGAME, WIN,LOSE};
 
@@ -526,6 +633,13 @@ int main(int argc, char* argv[]){
 					}
 				}
 
+				//const Sint16 Xvalue = SDL_GameControllerGetAxis(gGameController,SDL_CONTROLLER_AXIS_LEFTX);
+				//const Sint16 Yvalue = SDL_GameControllerGetAxis(gGameController,SDL_CONTROLLER_AXIS_LEFTY);
+
+				//Ship1.OnControllerAxis(Xvalue,Yvalue);
+
+				//Ship1.Update(deltaTime, renderer);
+
 				UpdateBackground(deltaTime);
 
 				UpdateCursor(deltaTime);
@@ -537,6 +651,10 @@ int main(int argc, char* argv[]){
 				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
 
 				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
+
+				SDL_RenderCopy(renderer, mouse, NULL, &mousePos);
+
+				//Ship1.Draw(renderer);
 
 				SDL_RenderPresent(renderer);
 			}
@@ -571,7 +689,21 @@ int main(int argc, char* argv[]){
 								{
 									instructions = false;
 									gameState = MENU;
-									StartGameOver = false;
+									MenuOver = false;
+								}
+
+								if(backstoryover)
+								{
+									instructions = false;
+									gameState = BACKSTORY;
+									backstoryover = false;
+								}
+
+								if(startgameover)
+								{
+									instructions = false;
+									gameState = STARTGAME;
+									startgameover = false;
 								}
 
 							}
@@ -591,6 +723,10 @@ int main(int argc, char* argv[]){
 
 				MenuOver = SDL_HasIntersection(&activePos, &MenubuttonPos);
 
+				startgameover = SDL_HasIntersection(&activePos, &StartGamebuttonPos);
+
+				backstoryover = SDL_HasIntersection(&activePos, &BackStorybuttonPos);
+
 				SDL_RenderClear(renderer);
 
 				SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
@@ -598,6 +734,8 @@ int main(int argc, char* argv[]){
 				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
 
 				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
+
+				SDL_RenderCopy(renderer, mouse, NULL, &mousePos);
 
 				SDL_RenderCopy(renderer, InsructionsText, NULL, &InsructionsTextPos);
 
@@ -608,6 +746,24 @@ int main(int argc, char* argv[]){
 				else
 				{
 					SDL_RenderCopy(renderer, Menubutton, NULL, &MenubuttonPos);
+				}
+
+				if(backstoryover)
+				{
+					SDL_RenderCopy(renderer, BackStorybuttonO, NULL, &BackStorybuttonPos);
+				}
+				else
+				{
+					SDL_RenderCopy(renderer, BackStorybutton, NULL, &BackStorybuttonPos);
+				}
+
+				if(startgameover)
+				{
+					SDL_RenderCopy(renderer, StartGamebuttonO, NULL, &StartGamebuttonPos);
+				}
+				else
+				{
+					SDL_RenderCopy(renderer, StartGamebutton, NULL, &StartGamebuttonPos);
 				}
 
 
@@ -642,7 +798,26 @@ int main(int argc, char* argv[]){
 						{
 							if(e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
 							{
+								if(MenuOver)
+								{
+									backstory = false;
+									gameState = MENU;
+									MenuOver = false;
+								}
 
+								if(instructionsover)
+								{
+									backstory = false;
+									gameState = INSTRUCTIONS;
+									instructionsover = false;
+								}
+
+								if(startgameover)
+								{
+									backstory = false;
+									gameState = STARTGAME;
+									startgameover = false;
+								}
 							}
 						}
 						break;
@@ -658,6 +833,12 @@ int main(int argc, char* argv[]){
 
 				UpdateCursor(deltaTime);
 
+				MenuOver = SDL_HasIntersection(&activePos, &MenubuttonPos);
+
+				startgameover = SDL_HasIntersection(&activePos, &StartGamebuttonPos);
+
+				instructionsover = SDL_HasIntersection(&activePos, &InstructionsButtonPos);
+
 				SDL_RenderClear(renderer);
 
 				SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
@@ -665,6 +846,37 @@ int main(int argc, char* argv[]){
 				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
 
 				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
+
+				SDL_RenderCopy(renderer, mouse, NULL, &mousePos);
+
+				SDL_RenderCopy(renderer, BackStoryText, NULL, &BackStoryTextPos);
+
+				if(MenuOver)
+				{
+					SDL_RenderCopy(renderer, MenubuttonO, NULL, &MenubuttonPos);
+				}
+				else
+				{
+					SDL_RenderCopy(renderer, Menubutton, NULL, &MenubuttonPos);
+				}
+
+				if(instructionsover)
+				{
+					SDL_RenderCopy(renderer, InstructionsButtonO, NULL, &InstructionsButtonPos);
+				}
+				else
+				{
+					SDL_RenderCopy(renderer, InstructionsButton, NULL, &InstructionsButtonPos);
+				}
+
+				if(startgameover)
+				{
+					SDL_RenderCopy(renderer, StartGamebuttonO, NULL, &StartGamebuttonPos);
+				}
+				else
+				{
+					SDL_RenderCopy(renderer, StartGamebutton, NULL, &StartGamebuttonPos);
+				}
 
 				SDL_RenderPresent(renderer);
 			}
@@ -695,6 +907,19 @@ int main(int argc, char* argv[]){
 						{
 							if(e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
 							{
+								if(MenuOver)
+								{
+									win = false;
+									gameState = MENU;
+									MenuOver = false;
+								}
+
+								if(startgameover)
+								{
+									win = false;
+									gameState = STARTGAME;
+									startgameover = false;
+								}
 
 							}
 						}
@@ -711,6 +936,10 @@ int main(int argc, char* argv[]){
 
 				UpdateCursor(deltaTime);
 
+				MenuOver = SDL_HasIntersection(&activePos, &MenubuttonPos);
+
+				startgameover = SDL_HasIntersection(&activePos, &StartGamebuttonPos);
+
 				SDL_RenderClear(renderer);
 
 				SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
@@ -718,6 +947,28 @@ int main(int argc, char* argv[]){
 				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
 
 				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
+
+				SDL_RenderCopy(renderer, mouse, NULL, &mousePos);
+
+				SDL_RenderCopy(renderer, WinText, NULL, &WinTextPos);
+
+				if(MenuOver)
+				{
+					SDL_RenderCopy(renderer, MenubuttonO, NULL, &MenubuttonPos);
+				}
+				else
+				{
+					SDL_RenderCopy(renderer, Menubutton, NULL, &MenubuttonPos);
+				}
+
+				if(startgameover)
+				{
+					SDL_RenderCopy(renderer, StartGamebuttonO, NULL, &StartGamebuttonPos);
+				}
+				else
+				{
+					SDL_RenderCopy(renderer, StartGamebutton, NULL, &StartGamebuttonPos);
+				}
 
 				SDL_RenderPresent(renderer);
 			}
@@ -748,7 +999,19 @@ int main(int argc, char* argv[]){
 						{
 							if(e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
 							{
+								if(MenuOver)
+								{
+									lose = false;
+									gameState = MENU;
+									MenuOver = false;
+								}
 
+								if(startgameover)
+								{
+									lose = false;
+									gameState = STARTGAME;
+									startgameover = false;
+								}
 							}
 						}
 						break;
@@ -764,6 +1027,10 @@ int main(int argc, char* argv[]){
 
 				UpdateCursor(deltaTime);
 
+				MenuOver = SDL_HasIntersection(&activePos, &MenubuttonPos);
+
+				startgameover = SDL_HasIntersection(&activePos, &StartGamebuttonPos);
+
 				SDL_RenderClear(renderer);
 
 				SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
@@ -771,6 +1038,28 @@ int main(int argc, char* argv[]){
 				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
 
 				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
+
+				SDL_RenderCopy(renderer, mouse, NULL, &mousePos);
+
+				SDL_RenderCopy(renderer, LoseText, NULL, &LoseTextPos);
+
+				if(MenuOver)
+				{
+					SDL_RenderCopy(renderer, MenubuttonO, NULL, &MenubuttonPos);
+				}
+				else
+				{
+					SDL_RenderCopy(renderer, Menubutton, NULL, &MenubuttonPos);
+				}
+
+				if(startgameover)
+				{
+					SDL_RenderCopy(renderer, StartGamebuttonO, NULL, &StartGamebuttonPos);
+				}
+				else
+				{
+					SDL_RenderCopy(renderer, StartGamebutton, NULL, &StartGamebuttonPos);
+				}
 
 				SDL_RenderPresent(renderer);
 			}
