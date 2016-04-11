@@ -46,6 +46,13 @@ string audio_dir = currentWorkingDirectory + "/final-game/";
 #endif
 
 #include "player.h"
+#include "enemy.h"
+#include "missile.h"
+#include <vector>
+#include <stdlib.h>
+#include <time.h>
+
+vector<Enemy> enemyList;
 
 SDL_Rect bkgd1Pos, bkgd2Pos;
 
@@ -459,7 +466,7 @@ int main(int argc, char* argv[]){
 
 	SDL_Event e;
 
-	//Ship Ship1 = Ship(renderer, 0, images_dir.c_str(), audio_dir.c_str(), 400.0,250.0);
+	Player player1 = Player(renderer, 0, images_dir.c_str(), audio_dir.c_str(), 250.0,500.0);
 
 	enum GameState{MENU, INSTRUCTIONS, BACKSTORY, STARTGAME, WIN,LOSE};
 
@@ -597,7 +604,19 @@ int main(int argc, char* argv[]){
 			break;
 
 		case STARTGAME:
+
+			enemyList.clear();
+
+			player1.Reset();
+
 			startgame = true;
+
+			for(int i = 0; i < 15; i++)
+			{
+				Enemy tmpEnemy(renderer, images_dir);
+
+				enemyList.push_back(tmpEnemy);
+			}
 
 			while(startgame)
 			{
@@ -623,26 +642,71 @@ int main(int argc, char* argv[]){
 							{
 
 							}
+							if(player1.active)
+							{
+								player1.OnControllerButton(e.cbutton);
+							}
 						}
 						break;
 
 					case SDL_CONTROLLERAXISMOTION:
-
-						moveCursor(e.caxis);
+						if(player1.active)
+						{
+							player1.OnControllerAxis(e.caxis);
+						}
 						break;
 					}
 				}
 
-				//const Sint16 Xvalue = SDL_GameControllerGetAxis(gGameController,SDL_CONTROLLER_AXIS_LEFTX);
-				//const Sint16 Yvalue = SDL_GameControllerGetAxis(gGameController,SDL_CONTROLLER_AXIS_LEFTY);
-
-				//Ship1.OnControllerAxis(Xvalue,Yvalue);
-
-				//Ship1.Update(deltaTime, renderer);
-
 				UpdateBackground(deltaTime);
+				if(player1.active)
+				{
+					player1.Update(deltaTime, renderer);
+				}
 
-				UpdateCursor(deltaTime);
+				if(player1.active == true)
+				{
+					for(int i = 0; i < enemyList.size(); i++)
+					{
+						enemyList[i].Update(deltaTime);
+					}
+
+					for(int i = 0; i < player1.bulletList.size(); i++)
+					{
+						if(player1.bulletList[i].active == true)
+						{
+							for(int j = 0; j < enemyList.size(); j ++)
+							{
+								if(SDL_HasIntersection(&player1.bulletList[i].posRect, &enemyList[j].posRect))
+								{
+									enemyList[j].Reset();
+
+									player1.bulletList[i].Reset();
+
+									player1.playerScore +=50;
+								}
+							}
+						}
+					}
+
+					for(int i = 0; i < enemyList.size(); i++)
+					{
+						if(SDL_HasIntersection(&player1.posRect,
+								&enemyList[i].posRect))
+						{
+							enemyList[i].Reset();
+
+							player1.playerLives -= 1;
+
+							if(player1.playerLives <= 0)
+							{
+								startgame = false;
+								gameState = LOSE;
+								break;
+							}
+						}
+					}
+				}
 
 				SDL_RenderClear(renderer);
 
@@ -650,11 +714,14 @@ int main(int argc, char* argv[]){
 
 				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
 
+				for(int i = 0; i <enemyList.size(); i++)
+				{
+					enemyList[i].Draw(renderer);
+				}
+
 				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
 
-				SDL_RenderCopy(renderer, mouse, NULL, &mousePos);
-
-				//Ship1.Draw(renderer);
+				player1.Draw(renderer);
 
 				SDL_RenderPresent(renderer);
 			}

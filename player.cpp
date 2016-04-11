@@ -2,15 +2,15 @@
 
 const int JOYSTICK_DEAD_ZONE = 8000;
 
-Ship::Ship(SDL_Renderer *renderer, int pNum, string filePath, string audioPath, float x, float y)
+Player::Player(SDL_Renderer *renderer, int pNum, string filePath, string audioPath, float x, float y)
 {
 	active = true;
 
 	playerNum = pNum;
 
-	speed = 200.0f;
+	speed = 500.0f;
 
-	fire = Mix_LoadWAV((audioPath + "Laser.wav").c_str());
+	laser = Mix_LoadWAV((audioPath + "Laser.wav").c_str());
 
 	oldScore = 0;
 	playerScore = 0;
@@ -22,8 +22,15 @@ Ship::Ship(SDL_Renderer *renderer, int pNum, string filePath, string audioPath, 
 	font = TTF_OpenFont((audioPath + "Long_Shot.ttf").c_str(), 40);
 
 	if(playerNum == 0){
+
 		scorePos.x = scorePos.y = 10;
 		livesPos.x = 10;
+		livesPos.y = 60;
+	}else{
+
+		scorePos.x = 650;
+		scorePos.y = 10;
+		livesPos.x = 650;
 		livesPos.y = 60;
 	}
 
@@ -31,17 +38,28 @@ Ship::Ship(SDL_Renderer *renderer, int pNum, string filePath, string audioPath, 
 
 	UpdateLives(renderer);
 
+	UpdateScore(renderer);
 
 	if(playerNum == 0){
-		playerPath = filePath + "spaceship.png";
+
+		playerPath = filePath + "player.png";
 	}
 
-	texture = IMG_LoadTexture(renderer, playerPath.c_str());
+	surface = IMG_Load(playerPath.c_str());
+
+	texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+	SDL_FreeSurface(surface);
 
 	posRect.x = x;
 	posRect.y = y;
-	posRect.w = 144;
-	posRect.h = 104;
+
+	int w, h;
+
+	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+
+	posRect.w = w;
+	posRect.h =h;
 
 	pos_X = x;
 	pos_Y = y;
@@ -49,23 +67,48 @@ Ship::Ship(SDL_Renderer *renderer, int pNum, string filePath, string audioPath, 
 	xDir = 0;
 	yDir = 0;
 
-	xDirOld = 1;
-	yDirOld = 0;
-
-	center.x = posRect.w/2;
-	center.y = posRect.h/2;
-
 	string bulletPath;
 
+	string missilePath;
+
 	if(playerNum == 0){
-		bulletPath = filePath + "missile.png";
+
+		bulletPath = filePath + "bullet.png";
+	}
+
+	if(playerNum == 0){
+
+		missilePath = filePath + "missile.png";
+	}
+
+	for(int i = 0; i < 10; i++)
+	{
+		Bullet tmpBullet(renderer, bulletPath, -1000, -1000);
+
+		bulletList.push_back(tmpBullet);
+
+	}
+
+	for(int i = 0; i < 10; i++)
+	{
+		Missile tmpMissile(renderer, bulletPath, -1000, -1000);
+
+		missileList.push_back(tmpMissile);
+
 	}
 
 }
 
-void Ship::Reset() {
+void Player::Reset() {
+
 	if (playerNum == 0) {
+
 		posRect.x = 250.0;
+		posRect.y = 500.0;
+	}
+	else {
+
+		posRect.x = 550.0;
 		posRect.y = 500.0;
 	}
 
@@ -79,7 +122,7 @@ void Ship::Reset() {
 
 }
 
-void Ship::UpdateLives(SDL_Renderer *renderer){
+void Player::UpdateLives(SDL_Renderer *renderer){
 
 	string Result;
 	ostringstream convert;
@@ -89,7 +132,9 @@ void Ship::UpdateLives(SDL_Renderer *renderer){
 	tempLives = "Player Lives: " + Result;
 
 	if(playerNum == 0){
+
 		livesSurface = TTF_RenderText_Solid(font, tempLives.c_str(), colorP1);
+
 	}
 
 	livesTexture = SDL_CreateTextureFromSurface(renderer, livesSurface);
@@ -100,9 +145,18 @@ void Ship::UpdateLives(SDL_Renderer *renderer){
 
 	oldLives = playerLives;
 
+	if (playerLives == 0)
+	{
+		active = false;
+
+		posRect.x = posRect.y = -2000;
+
+		pos_X = pos_Y = -2000;
+	}
+
 }
 
-void Ship::UpdateScore(SDL_Renderer *renderer){
+void Player::UpdateScore(SDL_Renderer *renderer){
 
 	string Result;
 	ostringstream convert;
@@ -112,6 +166,7 @@ void Ship::UpdateScore(SDL_Renderer *renderer){
 	tempScore = "Player Score: " + Result;
 
 	if(playerNum == 0){
+
 		scoreSurface = TTF_RenderText_Solid(font, tempScore.c_str(), colorP1);
 	}
 
@@ -125,88 +180,204 @@ void Ship::UpdateScore(SDL_Renderer *renderer){
 
 }
 
-void Ship::Update(float deltaTime, SDL_Renderer *renderer)
+void Player::Update(float deltaTime, SDL_Renderer * renderer)
 {
-	if(Xvalue != 0 || Yvalue != 0){
-		shipangle = atan2(Yvalue,Xvalue) * 180/3.14;
+	pos_X += (speed * xDir) * deltaTime;
+	pos_Y += (speed * yDir) * deltaTime;
 
-		oldAngle = shipangle;
+	posRect.x = (int)(pos_X + 0.5f);
+	posRect.y = (int)(pos_Y + 0.5f);
 
-		float radians = (shipangle * 3.14)/180;
-
-		float move_x = speed *cos(radians);
-		float move_y = speed *sin(radians);
-
-		pos_X += (move_x) * deltaTime;
-		pos_Y += (move_y) * deltaTime;
-
-		posRect.x = (int)(pos_X + 0.5f);
-		posRect.y = (int)(pos_Y + 0.5f);
-
-	}else {
-		shipangle = oldAngle;
-	}
-
-	if(posRect.x < 0){
+	if (posRect.x < 0){
 		posRect.x = 0;
 		pos_X = posRect.x;
 	}
 
-	if(posRect.x > 1024 - posRect.w){
+	if (posRect.x > 1024 - posRect.w){
 		posRect.x = 1024 - posRect.w;
 		pos_X = posRect.x;
 	}
 
-	if(posRect.y < 0){
+	if (posRect.y < 0){
 		posRect.y = 0;
 		pos_Y = posRect.y;
 	}
 
-	if(posRect.y > 768 - posRect.h){
+	if (posRect.y > 768 - posRect.h){
 		posRect.y = 768 - posRect.h;
 		pos_Y = posRect.y;
 	}
 
-		if(playerScore != oldScore){
+	for(int i = 0; i < bulletList.size(); i++)
+	{
+		if(bulletList[i].active){
 
-			UpdateScore(renderer);
+			bulletList[i].Update(deltaTime);
+		}
+	}
+
+	for(int i = 0; i < missileList.size(); i++)
+	{
+		if(missileList[i].active){
+
+			missileList[i].Update(deltaTime);
+		}
+	}
+
+	if(playerScore != oldScore){
+
+		UpdateScore(renderer);
+
+	}
+
+	if(playerLives != oldLives){
+
+		UpdateLives(renderer);
+
+	}
+}
+
+void Player::CreateBullet(){
+
+	for(int i = 0; i < bulletList.size(); i++)
+	{
+		if(bulletList[i].active == false){
+
+			Mix_PlayChannel(-1, laser, 0);
+
+			bulletList[i].active = true;
+
+			bulletList[i].posRect.x = (pos_X + (posRect.w/2));
+
+			bulletList[i].posRect.x = (bulletList[i].posRect.x - (bulletList[i].posRect.w/2));
+			bulletList[i].posRect.y = posRect.y;
+
+			bulletList[i].pos_X = pos_X;
+			bulletList[i].pos_Y = pos_Y;
+
+			break;
+		}
+
+	}
+}
+
+void Player::CreateMissile(){
+
+	for(int i = 0; i < missileList.size(); i++)
+	{
+		if(missileList[i].active == false){
+
+			Mix_PlayChannel(-1, laser, 0);
+
+			missileList[i].active = true;
+
+			missileList[i].posRect.x = (pos_X + (posRect.w/2));
+
+			missileList[i].posRect.x = (missileList[i].posRect.x - (missileList[i].posRect.w/2));
+			missileList[i].posRect.y = posRect.y;
+
+			missileList[i].pos_X = pos_X;
+			missileList[i].pos_Y = pos_Y;
+
+			break;
+		}
+
+	}
+}
+
+void Player::OnControllerButton(const SDL_ControllerButtonEvent event)
+{
+	if(event.which == 0 && playerNum == 0)
+	{
+		if(event.button == 0)
+		{
+			CreateBullet();
 
 		}
 
-		if(playerLives != oldScore){
+	}
 
-			UpdateLives(renderer);
+	if(event.which == 0 && playerNum == 0)
+	{
+		if(event.button == 1)
+		{
+			CreateMissile();
 
 		}
+
+	}
 
 }
 
-void Ship::Draw(SDL_Renderer *renderer)
+void Player::OnControllerAxis(const SDL_ControllerAxisEvent event)
 {
+	if(event.which == 0 && playerNum == 0)
+	{
+		if(event.axis == 0)
+		{
 
-	SDL_RenderCopyEx(renderer, texture, NULL, &posRect, shipangle, &center, SDL_FLIP_NONE);
+			if(event.value < - JOYSTICK_DEAD_ZONE)
+			{
+				xDir = -1.0f;
+			}
+			else if(event.value > JOYSTICK_DEAD_ZONE)
+			{
+				xDir = 1.0f;
+			}
+			else
+			{
+				xDir = 0.0f;
+			}
+		}
+
+		if(event.axis == 1)
+		{
+
+			if(event.value < - JOYSTICK_DEAD_ZONE)
+			{
+				yDir = -1.0f;
+			}
+			else if(event.value > JOYSTICK_DEAD_ZONE)
+			{
+				yDir = 1.0f;
+			}
+			else
+			{
+				yDir = 0.0f;
+			}
+		}
+
+	}
+}
+
+void Player::Draw(SDL_Renderer *renderer)
+{
+	SDL_RenderCopy(renderer, texture, NULL, &posRect);
+
+	for(int i = 0; i < bulletList.size(); i++)
+	{
+		if(bulletList[i].active){
+
+			bulletList[i].Draw(renderer);
+		}
+	}
+
+	for(int i = 0; i < missileList.size(); i++)
+	{
+		if(missileList[i].active){
+
+			missileList[i].Draw(renderer);
+		}
+	}
 
 	SDL_RenderCopy(renderer, scoreTexture, NULL, &scorePos);
 
 	SDL_RenderCopy(renderer, livesTexture, NULL, &livesPos);
 }
 
-
-void Ship::OnControllerAxis(Sint16 X, Sint16 Y)
+Player::~Player()
 {
-	Xvalue = X;
-	Yvalue = Y;
-
-	if(!(Xvalue < -JOYSTICK_DEAD_ZONE)&&!(Xvalue > JOYSTICK_DEAD_ZONE))
-	{
-		Xvalue = 0.0f;
-	}
-
-	if(!(Yvalue < -JOYSTICK_DEAD_ZONE)&&!(Yvalue > JOYSTICK_DEAD_ZONE))
-	{
-		Yvalue = 0.0f;
-	}
-
+	SDL_DestroyTexture(texture);
 
 }
 
