@@ -47,10 +47,11 @@ string audio_dir = currentWorkingDirectory + "/final-game/";
 
 #include "player.h"
 #include "enemy.h"
-#include "missile.h"
+//#include "missile.h"
 #include <vector>
 #include <stdlib.h>
 #include <time.h>
+#include "turrent.h"
 
 vector<Enemy> enemyList;
 
@@ -468,7 +469,11 @@ int main(int argc, char* argv[]){
 
 	Player player1 = Player(renderer, 0, images_dir.c_str(), audio_dir.c_str(), 250.0,500.0);
 
-	enum GameState{MENU, INSTRUCTIONS, BACKSTORY, STARTGAME, WIN,LOSE};
+	Turrent turret1 = Turrent(renderer, images_dir.c_str(), audio_dir.c_str(), 10.0, 600.0);
+
+	Turrent turret2 = Turrent(renderer, images_dir.c_str(), audio_dir.c_str(), 900.0, 600.0);
+
+	enum GameState{MENU, INSTRUCTIONS, BACKSTORY, STARTGAME, LEVEL2, WIN,LOSE};
 
 	GameState gameState = MENU;
 
@@ -611,7 +616,7 @@ int main(int argc, char* argv[]){
 
 			startgame = true;
 
-			for(int i = 0; i < 15; i++)
+			for(int i = 0; i < 5; i++)
 			{
 				Enemy tmpEnemy(renderer, images_dir);
 
@@ -659,10 +664,15 @@ int main(int argc, char* argv[]){
 				}
 
 				UpdateBackground(deltaTime);
+
 				if(player1.active)
 				{
 					player1.Update(deltaTime, renderer);
 				}
+
+				turret1.Update(deltaTime, player1.posRect);
+
+				turret2.Update(deltaTime, player1.posRect);
 
 				if(player1.active == true)
 				{
@@ -708,6 +718,39 @@ int main(int argc, char* argv[]){
 					}
 				}
 
+
+				for (int i = 0; i < turret1.bulletList.size(); i++)
+				{
+					if(SDL_HasIntersection(&player1.posRect, &turret1.bulletList[i].posRect)){
+						turret1.bulletList[i].Reset();
+
+						player1.playerLives -= 1;
+
+						if(player1.playerLives <= 0)
+						{
+							startgame = false;
+							gameState = LOSE;
+							break;
+						}
+					}
+				}
+
+				for (int i = 0; i < turret2.bulletList.size(); i++)
+				{
+					if(SDL_HasIntersection(&player1.posRect, &turret2.bulletList[i].posRect)){
+						turret2.bulletList[i].Reset();
+
+						player1.playerLives -= 1;
+
+						if(player1.playerLives <= 0)
+						{
+							startgame = false;
+							gameState = LOSE;
+							break;
+						}
+					}
+				}
+
 				SDL_RenderClear(renderer);
 
 				SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
@@ -722,6 +765,10 @@ int main(int argc, char* argv[]){
 				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
 
 				player1.Draw(renderer);
+
+				turret1.Draw(renderer);
+
+				turret2.Draw(renderer);
 
 				SDL_RenderPresent(renderer);
 			}
