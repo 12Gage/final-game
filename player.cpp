@@ -106,11 +106,6 @@ void Player::Reset() {
 		posRect.x = 250.0;
 		posRect.y = 500.0;
 	}
-	else {
-
-		posRect.x = 550.0;
-		posRect.y = 500.0;
-	}
 
 	pos_X = posRect.x;
 	pos_Y = posRect.y;

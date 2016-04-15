@@ -52,6 +52,7 @@ string audio_dir = currentWorkingDirectory + "/final-game/";
 #include <stdlib.h>
 #include <time.h>
 #include "turrent.h"
+#include "pickup.h"
 
 vector<Enemy> enemyList;
 
@@ -459,6 +460,42 @@ int main(int argc, char* argv[]){
 	StartGamebuttonPos.w = 212;
 	StartGamebuttonPos.h = 32;
 
+	SDL_Texture *gaugeBlank = IMG_LoadTexture(renderer, (images_dir + "gaugeBlank.png").c_str());
+	SDL_Rect gaugeBlankRect;
+	gaugeBlankRect.x = 370;
+	gaugeBlankRect.y = 10;
+	gaugeBlankRect.w = 19;
+	gaugeBlankRect.h = 9;
+
+	SDL_Texture *gaugeFill1 = IMG_LoadTexture(renderer, (images_dir + "gaugeFill1.png").c_str());
+	SDL_Rect gaugeFill1Pos;
+	gaugeFill1Pos.x = 370;
+	gaugeFill1Pos.y = 10;
+	gaugeFill1Pos.w = 19;
+	gaugeFill1Pos.h = 9;
+
+	SDL_Texture *gaugeFill2 = IMG_LoadTexture(renderer, (images_dir + "gaugeFill2.png").c_str());
+	SDL_Rect gaugeFill2Pos;
+	gaugeFill2Pos.x = 370;
+	gaugeFill2Pos.y = 10;
+	gaugeFill2Pos.w = 19;
+	gaugeFill2Pos.h = 9;
+
+	SDL_Texture *gaugeFill3 = IMG_LoadTexture(renderer, (images_dir + "gaugeFill3.png").c_str());
+	SDL_Rect gaugeFill3Pos;
+	gaugeFill3Pos.x = 370;
+	gaugeFill3Pos.y = 10;
+	gaugeFill3Pos.w = 19;
+	gaugeFill3Pos.h = 9;
+
+	bool havegaugeFill1 = false;
+	bool havegaugeFill2 = false;
+	bool havegaugeFill3 = false;
+
+	Pickup gauge1 = Pickup(renderer, images_dir.c_str(), 0,200.0f,600.0f);
+	Pickup gauge2 = Pickup(renderer, images_dir.c_str(), 1,200.0f,600.0f);
+	Pickup gauge3 = Pickup(renderer, images_dir.c_str(), 2,200.0f,600.0f);
+
 	SDL_GameController* gGameController = NULL;
 
 	gGameController = SDL_GameControllerOpen(0);
@@ -469,15 +506,15 @@ int main(int argc, char* argv[]){
 
 	Player player1 = Player(renderer, 0, images_dir.c_str(), audio_dir.c_str(), 250.0,500.0);
 
-	Turrent turret1 = Turrent(renderer, images_dir.c_str(), audio_dir.c_str(), 10.0, 600.0);
+	Turrent turret1 = Turrent(renderer, images_dir.c_str(), audio_dir.c_str(), 10.0, 200.0);
 
-	Turrent turret2 = Turrent(renderer, images_dir.c_str(), audio_dir.c_str(), 900.0, 600.0);
+	Turrent turret2 = Turrent(renderer, images_dir.c_str(), audio_dir.c_str(), 900.0, 200.0);
 
 	enum GameState{MENU, INSTRUCTIONS, BACKSTORY, STARTGAME, LEVEL2, WIN,LOSE};
 
 	GameState gameState = MENU;
 
-	bool menu, instructions, backstory, startgame, win, lose, quit;
+	bool menu, instructions, backstory, startgame, level2, win, lose, quit;
 
 	quit = false;
 
@@ -751,6 +788,27 @@ int main(int argc, char* argv[]){
 					}
 				}
 
+				if(SDL_HasIntersection(&player1.posRect, &gauge1.pickupRect)){
+					havegaugeFill1 = true;
+					gauge1.active = false;
+					gauge1.pickupRect.x = -5000;
+					gauge1.pickupRect.y = -5000;
+				}
+
+				if(SDL_HasIntersection(&player1.posRect, &gauge2.pickupRect)){
+					havegaugeFill2 = true;
+					gauge2.active = false;
+					gauge2.pickupRect.x = -5000;
+					gauge2.pickupRect.y = -5000;
+				}
+
+				if(SDL_HasIntersection(&player1.posRect, &gauge3.pickupRect)){
+					havegaugeFill3 = true;
+					gauge3.active = false;
+					gauge3.pickupRect.x = -5000;
+					gauge3.pickupRect.y = -5000;
+				}
+
 				SDL_RenderClear(renderer);
 
 				SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
@@ -764,6 +822,147 @@ int main(int argc, char* argv[]){
 
 				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
 
+
+
+
+
+
+
+				player1.Draw(renderer);
+
+				turret1.Draw(renderer);
+
+				turret2.Draw(renderer);
+
+				if(player1.playerScore >= 100)
+				{
+					if(havegaugeFill1)
+					SDL_RenderCopy(renderer, gaugeFill1, NULL, &gaugeFill1Pos);
+
+				if(gauge1.active)
+					gauge1.Draw(renderer);
+				}
+
+				if(player1.playerScore >= 200)
+				{
+					if(havegaugeFill2)
+					SDL_RenderCopy(renderer, gaugeFill2, NULL, &gaugeFill2Pos);
+
+				if(gauge2.active)
+					gauge2.Draw(renderer);
+				}
+
+				if(player1.playerScore >= 300)
+				{
+					if(havegaugeFill3)
+					SDL_RenderCopy(renderer, gaugeFill3, NULL, &gaugeFill3Pos);
+
+				if(gauge3.active)
+					gauge3.Draw(renderer);
+				}
+
+				SDL_RenderPresent(renderer);
+			}
+			break;
+
+		case LEVEL2:
+
+			player1.Reset();
+
+			level2 = true;
+
+			while(startgame)
+			{
+				thisTime = SDL_GetTicks();
+				deltaTime = (float)(thisTime - lastTime)/1000;
+				lastTime = thisTime;
+
+				if(SDL_PollEvent(&e))
+				{
+					if(e.type == SDL_QUIT)
+					{
+						quit = true;
+						menu = false;
+						break;
+					}
+
+					switch(e.type)
+					{
+					case SDL_CONTROLLERBUTTONDOWN:
+						if(e.cdevice.which == 0)
+						{
+							if(e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+							{
+
+							}
+							if(player1.active)
+							{
+								player1.OnControllerButton(e.cbutton);
+							}
+						}
+						break;
+
+					case SDL_CONTROLLERAXISMOTION:
+						if(player1.active)
+						{
+							player1.OnControllerAxis(e.caxis);
+						}
+						break;
+					}
+				}
+
+				UpdateBackground(deltaTime);
+
+				if(player1.active)
+				{
+					player1.Update(deltaTime, renderer);
+				}
+
+				turret1.Update(deltaTime, player1.posRect);
+
+				turret2.Update(deltaTime, player1.posRect);
+
+
+				for (int i = 0; i < turret1.bulletList.size(); i++)
+				{
+					if(SDL_HasIntersection(&player1.posRect, &turret1.bulletList[i].posRect)){
+						turret1.bulletList[i].Reset();
+
+						player1.playerLives -= 1;
+
+						if(player1.playerLives <= 0)
+						{
+							startgame = false;
+							gameState = LOSE;
+							break;
+						}
+					}
+				}
+
+				for (int i = 0; i < turret2.bulletList.size(); i++)
+				{
+					if(SDL_HasIntersection(&player1.posRect, &turret2.bulletList[i].posRect)){
+						turret2.bulletList[i].Reset();
+
+						player1.playerLives -= 1;
+
+						if(player1.playerLives <= 0)
+						{
+							startgame = false;
+							gameState = LOSE;
+							break;
+						}
+					}
+				}
+
+				SDL_RenderClear(renderer);
+
+				SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
+
+				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
+
+				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
+
 				player1.Draw(renderer);
 
 				turret1.Draw(renderer);
@@ -773,6 +972,7 @@ int main(int argc, char* argv[]){
 				SDL_RenderPresent(renderer);
 			}
 			break;
+
 
 		case INSTRUCTIONS:
 			instructions = true;
