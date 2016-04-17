@@ -4,7 +4,7 @@ Turrent::Turrent(SDL_Renderer *renderer, string filePath, string audioPath, floa
 {
 	active = true;
 
-	fire = Mix_LoadWAV((audioPath + "laser.wav").c_str());
+	fire = Mix_LoadWAV((audioPath + "Laser.wav").c_str());
 
 	string basePath = filePath + "Aturret.png";
 
@@ -76,7 +76,6 @@ void Turrent::Draw(SDL_Renderer *renderer)
 	{
 		if(bulletList[i].active){
 
-			//draw bullet
 			bulletList[i].Draw(renderer);
 		}
 	}

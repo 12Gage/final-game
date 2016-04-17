@@ -4,7 +4,7 @@ TurretBullet::TurretBullet(SDL_Renderer *renderer, string filePath, float x, flo
 {
 	active = false;
 
-	speed = 800.0;
+	speed = 400.0;
 
 	texture = IMG_LoadTexture(renderer, filePath.c_str());
 

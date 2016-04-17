@@ -730,7 +730,7 @@ int main(int argc, char* argv[]){
 
 									player1.bulletList[i].Reset();
 
-									player1.playerScore +=50;
+									player1.playerScore +=100;
 								}
 							}
 						}
@@ -822,12 +822,6 @@ int main(int argc, char* argv[]){
 
 				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
 
-
-
-
-
-
-
 				player1.Draw(renderer);
 
 				turret1.Draw(renderer);
@@ -861,6 +855,13 @@ int main(int argc, char* argv[]){
 					gauge3.Draw(renderer);
 				}
 
+				if (player1.playerScore >= 1000)
+				{
+					startgame = false;
+					gameState = LEVEL2;
+					break;
+				}
+
 				SDL_RenderPresent(renderer);
 			}
 			break;
@@ -871,7 +872,7 @@ int main(int argc, char* argv[]){
 
 			level2 = true;
 
-			while(startgame)
+			while(level2)
 			{
 				thisTime = SDL_GetTicks();
 				deltaTime = (float)(thisTime - lastTime)/1000;
