@@ -34,19 +34,19 @@ public:
 
 	bool active;
 
-	int playerScore, oldScore, playerLives, oldLives;
+	int playerScore, oldScore, playerLives, oldLives, missiles, oldMissiles;
 
 	TTF_Font *font;
 
 	SDL_Color colorP1 = {255,255,255,255};
 
-	SDL_Surface *scoreSurface, *livesSurface;
+	SDL_Surface *scoreSurface, *livesSurface, *missileSurface;
 
-	SDL_Texture *scoreTexture, *livesTexture;
+	SDL_Texture *scoreTexture, *livesTexture, *missileTexture;
 
-	SDL_Rect scorePos, livesPos;
+	SDL_Rect scorePos, livesPos, missilePos;
 
-	string tempScore, tempLives;
+	string tempScore, tempLives, tempMissiles;
 
 	Mix_Chunk *laser;
 
@@ -86,6 +86,8 @@ public:
 	void UpdateScore(SDL_Renderer *renderer);
 
 	void UpdateLives(SDL_Renderer *renderer);
+
+	void UpdateMissiles(SDL_Renderer *renderer);
 
 	void Reset();
 

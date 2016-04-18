@@ -31,6 +31,8 @@ class Turrent{
 public:
 	bool active;
 
+	int health;
+
 	vector<TurretBullet> bulletList;
 
 	string turrentPath;
@@ -66,6 +68,10 @@ public:
 	void TankMoveX(float tankSpeed, float deltaTime);
 
 	void TankMoveY(float tankSpeed, float deltaTime);
+
+	void RemoveHealthBullet();
+
+	void RemoveHealthMissile();
 
 	float posB_X, posB_Y, posT_X, posT_Y;
 };

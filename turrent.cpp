@@ -49,6 +49,41 @@ Turrent::Turrent(SDL_Renderer *renderer, string filePath, string audioPath, floa
 	posT_X = barrelRect.x;
 	posT_Y = barrelRect.y;
 
+	health = 10;
+
+}
+
+void Turrent::RemoveHealthBullet()
+{
+	health -= 1;
+
+	if(health <= 0){
+		Reset();
+	}
+}
+
+void Turrent::RemoveHealthMissile()
+{
+	health -= 5;
+
+	if(health <= 0){
+		Reset();
+	}
+}
+
+void Turrent::Reset()
+{
+	baseRect.x = -1000;
+
+	barrelRect.x = -1000;
+
+	posT_X = baseRect.x;
+
+	posT_X = barrelRect.x;
+
+	health = 10;
+
+	active = false;
 }
 
 void Turrent::TankMoveX(float tankSpeed, float deltaTime)

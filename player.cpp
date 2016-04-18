@@ -16,6 +16,8 @@ Player::Player(SDL_Renderer *renderer, int pNum, string filePath, string audioPa
 	playerScore = 0;
 	oldLives = 0;
 	playerLives = 3;
+	oldMissiles = 0;
+	missiles = 3;
 
 	TTF_Init();
 
@@ -26,12 +28,9 @@ Player::Player(SDL_Renderer *renderer, int pNum, string filePath, string audioPa
 		scorePos.x = scorePos.y = 10;
 		livesPos.x = 10;
 		livesPos.y = 60;
-	}else{
 
-		scorePos.x = 650;
-		scorePos.y = 10;
-		livesPos.x = 650;
-		livesPos.y = 60;
+		missilePos.x = 10;
+		missilePos.y = 700;
 	}
 
 	UpdateScore(renderer);
@@ -91,7 +90,7 @@ Player::Player(SDL_Renderer *renderer, int pNum, string filePath, string audioPa
 
 	for(int i = 0; i < 10; i++)
 	{
-		Missile tmpMissile(renderer, bulletPath, -1000, -1000);
+		Missile tmpMissile(renderer, missilePath, -1000, -1000);
 
 		missileList.push_back(tmpMissile);
 
@@ -175,6 +174,30 @@ void Player::UpdateScore(SDL_Renderer *renderer){
 
 }
 
+void Player::UpdateMissiles(SDL_Renderer *renderer){
+
+	string Result;
+	ostringstream convert;
+	convert << missiles;
+	Result = convert.str();
+
+	tempMissiles = "Missiles: " + Result;
+
+	if(playerNum == 0){
+
+		missileSurface = TTF_RenderText_Solid(font, tempMissiles.c_str(), colorP1);
+	}
+
+	missileTexture = SDL_CreateTextureFromSurface(renderer, missileSurface);
+
+	SDL_QueryTexture(missileTexture, NULL, NULL, &missilePos.w, &missilePos.h);
+
+	SDL_FreeSurface(missileSurface);
+
+	oldMissiles = missiles;
+
+}
+
 void Player::Update(float deltaTime, SDL_Renderer * renderer)
 {
 	pos_X += (speed * xDir) * deltaTime;
@@ -228,6 +251,12 @@ void Player::Update(float deltaTime, SDL_Renderer * renderer)
 	if(playerLives != oldLives){
 
 		UpdateLives(renderer);
+
+	}
+
+	if(missiles != oldMissiles){
+
+		UpdateMissiles(renderer);
 
 	}
 }
@@ -297,6 +326,8 @@ void Player::OnControllerButton(const SDL_ControllerButtonEvent event)
 		if(event.button == 1)
 		{
 			CreateMissile();
+
+			missiles -= 1;
 
 		}
 
@@ -368,6 +399,8 @@ void Player::Draw(SDL_Renderer *renderer)
 	SDL_RenderCopy(renderer, scoreTexture, NULL, &scorePos);
 
 	SDL_RenderCopy(renderer, livesTexture, NULL, &livesPos);
+
+	SDL_RenderCopy(renderer, missileTexture, NULL, &missilePos);
 }
 
 Player::~Player()

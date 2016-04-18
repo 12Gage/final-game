@@ -47,7 +47,6 @@ string audio_dir = currentWorkingDirectory + "/final-game/";
 
 #include "player.h"
 #include "enemy.h"
-//#include "missile.h"
 #include <vector>
 #include <stdlib.h>
 #include <time.h>
@@ -651,6 +650,11 @@ int main(int argc, char* argv[]){
 
 			player1.Reset();
 
+			for(int i = 0; i < player1.bulletList.size(); i++)
+			{
+				player1.bulletList[i].Reset();
+			}
+
 			startgame = true;
 
 			for(int i = 0; i < 5; i++)
@@ -732,6 +736,60 @@ int main(int argc, char* argv[]){
 
 									player1.playerScore +=100;
 								}
+
+								if(SDL_HasIntersection(&turret1.baseRect, &player1.bulletList[i].posRect))
+								{
+									player1.bulletList[i].Reset();
+									if(turret1.active == true)
+									{
+										turret1.RemoveHealthBullet();
+									}
+								}
+
+								if(SDL_HasIntersection(&turret2.baseRect, &player1.bulletList[i].posRect))
+								{
+									player1.bulletList[i].Reset();
+									if(turret2.active == true)
+									{
+										turret2.RemoveHealthBullet();
+									}
+								}
+							}
+						}
+					}
+
+					for(int i = 0; i < player1.missileList.size(); i++)
+					{
+						if(player1.missileList[i].active == true)
+						{
+							for(int j = 0; j < enemyList.size(); j ++)
+							{
+								if(SDL_HasIntersection(&player1.missileList[i].posRect, &enemyList[j].posRect))
+								{
+									enemyList[j].Reset();
+
+									player1.missileList[i].Reset();
+
+									player1.playerScore +=100;
+								}
+
+								if(SDL_HasIntersection(&turret1.baseRect, &player1.missileList[i].posRect))
+								{
+									player1.missileList[i].Reset();
+									if(turret1.active == true)
+									{
+										turret1.RemoveHealthMissile();
+									}
+								}
+
+								if(SDL_HasIntersection(&turret2.baseRect, &player1.missileList[i].posRect))
+								{
+									player1.missileList[i].Reset();
+									if(turret2.active == true)
+									{
+										turret2.RemoveHealthMissile();
+									}
+								}
 							}
 						}
 					}
@@ -754,7 +812,6 @@ int main(int argc, char* argv[]){
 						}
 					}
 				}
-
 
 				for (int i = 0; i < turret1.bulletList.size(); i++)
 				{
@@ -933,7 +990,7 @@ int main(int argc, char* argv[]){
 
 						if(player1.playerLives <= 0)
 						{
-							startgame = false;
+							level2 = false;
 							gameState = LOSE;
 							break;
 						}
@@ -949,7 +1006,7 @@ int main(int argc, char* argv[]){
 
 						if(player1.playerLives <= 0)
 						{
-							startgame = false;
+							level2 = false;
 							gameState = LOSE;
 							break;
 						}
