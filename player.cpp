@@ -110,6 +110,7 @@ void Player::Reset() {
 	pos_Y = posRect.y;
 	playerLives = 3;
 	playerScore = 0;
+	missiles = 3;
 	xDir = 0;
 	yDir = 0;
 	active = true;

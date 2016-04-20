@@ -53,6 +53,28 @@ Turrent::Turrent(SDL_Renderer *renderer, string filePath, string audioPath, floa
 
 }
 
+void Turrent::ResetTurret1()
+{
+	baseRect.x = 10;
+	baseRect.y = 200;
+
+	barrelRect.x = 50;
+	barrelRect.y = 235;
+
+	active = true;
+}
+
+void Turrent::ResetTurret2()
+{
+	baseRect.x = 900;
+	baseRect.y = 200;
+
+	barrelRect.x = 940;
+	barrelRect.y = 235;
+
+	active = true;
+}
+
 void Turrent::RemoveHealthBullet()
 {
 	health -= 1;

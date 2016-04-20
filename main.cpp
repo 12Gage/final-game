@@ -650,9 +650,18 @@ int main(int argc, char* argv[]){
 
 			player1.Reset();
 
+			turret1.ResetTurret1();
+
+			turret2.ResetTurret2();
+
 			for(int i = 0; i < player1.bulletList.size(); i++)
 			{
 				player1.bulletList[i].Reset();
+			}
+
+			for (int i = 0; i < player1.missileList.size(); i++)
+			{
+				player1.missileList[i].Reset();
 			}
 
 			startgame = true;
@@ -925,35 +934,47 @@ int main(int argc, char* argv[]){
 
 		case LEVEL2:
 
-			player1.Reset();
+			turret1.ResetTurret1();
+
+			turret2.ResetTurret2();
+
+			for (int i = 0; i < player1.bulletList.size(); i++)
+			{
+				player1.bulletList[i].Reset();
+			}
+
+			for (int i = 0; i < player1.missileList.size(); i++)
+			{
+				player1.missileList[i].Reset();
+			}
 
 			level2 = true;
 
-			while(level2)
+			while (level2)
 			{
 				thisTime = SDL_GetTicks();
-				deltaTime = (float)(thisTime - lastTime)/1000;
+				deltaTime = (float)(thisTime - lastTime) / 1000;
 				lastTime = thisTime;
 
-				if(SDL_PollEvent(&e))
+				if (SDL_PollEvent(&e))
 				{
-					if(e.type == SDL_QUIT)
+					if (e.type == SDL_QUIT)
 					{
 						quit = true;
 						menu = false;
 						break;
 					}
 
-					switch(e.type)
+					switch (e.type)
 					{
 					case SDL_CONTROLLERBUTTONDOWN:
-						if(e.cdevice.which == 0)
+						if (e.cdevice.which == 0)
 						{
-							if(e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+							if (e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
 							{
 
 							}
-							if(player1.active)
+							if (player1.active)
 							{
 								player1.OnControllerButton(e.cbutton);
 							}
@@ -961,7 +982,7 @@ int main(int argc, char* argv[]){
 						break;
 
 					case SDL_CONTROLLERAXISMOTION:
-						if(player1.active)
+						if (player1.active)
 						{
 							player1.OnControllerAxis(e.caxis);
 						}
@@ -971,7 +992,7 @@ int main(int argc, char* argv[]){
 
 				UpdateBackground(deltaTime);
 
-				if(player1.active)
+				if (player1.active)
 				{
 					player1.Update(deltaTime, renderer);
 				}
@@ -980,15 +1001,72 @@ int main(int argc, char* argv[]){
 
 				turret2.Update(deltaTime, player1.posRect);
 
+				if (player1.active == true)
+				{
+					for (int i = 0; i < player1.bulletList.size(); i++)
+					{
+						if (player1.bulletList[i].active == true)
+						{
+							for (int j = 0; j < enemyList.size(); j++)
+							{
+
+								if (SDL_HasIntersection(&turret1.baseRect, &player1.bulletList[i].posRect))
+								{
+									player1.bulletList[i].Reset();
+									if (turret1.active == true)
+									{
+										turret1.RemoveHealthBullet();
+									}
+								}
+
+								if (SDL_HasIntersection(&turret2.baseRect, &player1.bulletList[i].posRect))
+								{
+									player1.bulletList[i].Reset();
+									if (turret2.active == true)
+									{
+										turret2.RemoveHealthBullet();
+									}
+								}
+							}
+						}
+					}
+
+					for (int i = 0; i < player1.missileList.size(); i++)
+					{
+						if (player1.missileList[i].active == true)
+						{
+							for (int j = 0; j < enemyList.size(); j++)
+							{
+								if (SDL_HasIntersection(&turret1.baseRect, &player1.missileList[i].posRect))
+								{
+									player1.missileList[i].Reset();
+									if (turret1.active == true)
+									{
+										turret1.RemoveHealthMissile();
+									}
+								}
+
+								if (SDL_HasIntersection(&turret2.baseRect, &player1.missileList[i].posRect))
+								{
+									player1.missileList[i].Reset();
+									if (turret2.active == true)
+									{
+										turret2.RemoveHealthMissile();
+									}
+								}
+							}
+						}
+					}
+				}
 
 				for (int i = 0; i < turret1.bulletList.size(); i++)
 				{
-					if(SDL_HasIntersection(&player1.posRect, &turret1.bulletList[i].posRect)){
+					if (SDL_HasIntersection(&player1.posRect, &turret1.bulletList[i].posRect)) {
 						turret1.bulletList[i].Reset();
 
 						player1.playerLives -= 1;
 
-						if(player1.playerLives <= 0)
+						if (player1.playerLives <= 0)
 						{
 							level2 = false;
 							gameState = LOSE;
@@ -999,18 +1077,39 @@ int main(int argc, char* argv[]){
 
 				for (int i = 0; i < turret2.bulletList.size(); i++)
 				{
-					if(SDL_HasIntersection(&player1.posRect, &turret2.bulletList[i].posRect)){
+					if (SDL_HasIntersection(&player1.posRect, &turret2.bulletList[i].posRect)) {
 						turret2.bulletList[i].Reset();
 
 						player1.playerLives -= 1;
 
-						if(player1.playerLives <= 0)
+						if (player1.playerLives <= 0)
 						{
 							level2 = false;
 							gameState = LOSE;
 							break;
 						}
 					}
+				}
+
+				if (SDL_HasIntersection(&player1.posRect, &gauge1.pickupRect)) {
+					havegaugeFill1 = true;
+					gauge1.active = false;
+					gauge1.pickupRect.x = -5000;
+					gauge1.pickupRect.y = -5000;
+				}
+
+				if (SDL_HasIntersection(&player1.posRect, &gauge2.pickupRect)) {
+					havegaugeFill2 = true;
+					gauge2.active = false;
+					gauge2.pickupRect.x = -5000;
+					gauge2.pickupRect.y = -5000;
+				}
+
+				if (SDL_HasIntersection(&player1.posRect, &gauge3.pickupRect)) {
+					havegaugeFill3 = true;
+					gauge3.active = false;
+					gauge3.pickupRect.x = -5000;
+					gauge3.pickupRect.y = -5000;
 				}
 
 				SDL_RenderClear(renderer);
@@ -1026,6 +1125,33 @@ int main(int argc, char* argv[]){
 				turret1.Draw(renderer);
 
 				turret2.Draw(renderer);
+
+				if (player1.playerScore >= 100)
+				{
+					if (havegaugeFill1)
+						SDL_RenderCopy(renderer, gaugeFill1, NULL, &gaugeFill1Pos);
+
+					if (gauge1.active)
+						gauge1.Draw(renderer);
+				}
+
+				if (player1.playerScore >= 200)
+				{
+					if (havegaugeFill2)
+						SDL_RenderCopy(renderer, gaugeFill2, NULL, &gaugeFill2Pos);
+
+					if (gauge2.active)
+						gauge2.Draw(renderer);
+				}
+
+				if (player1.playerScore >= 300)
+				{
+					if (havegaugeFill3)
+						SDL_RenderCopy(renderer, gaugeFill3, NULL, &gaugeFill3Pos);
+
+					if (gauge3.active)
+						gauge3.Draw(renderer);
+				}
 
 				SDL_RenderPresent(renderer);
 			}

@@ -73,5 +73,9 @@ public:
 
 	void RemoveHealthMissile();
 
+	void ResetTurret1();
+
+	void ResetTurret2();
+
 	float posB_X, posB_Y, posT_X, posT_Y;
 };
