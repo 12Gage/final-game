@@ -52,8 +52,27 @@ string audio_dir = currentWorkingDirectory + "/final-game/";
 #include <time.h>
 #include "turrent.h"
 #include "pickup.h"
+#include "explode.h"
 
 vector<Enemy> enemyList;
+
+vector<Explode> explodeList;
+
+void MakeExplosion(int x, int y){
+
+	for(int i = 0; i < explodeList.size(); i ++)
+	{
+		if(explodeList[i].active == false){
+
+			explodeList [i].active = true;
+
+			explodeList[i].posRect.x = x;
+			explodeList[i].posRect.y = y;
+
+			break;
+		}
+	}
+}
 
 SDL_Rect bkgd1Pos, bkgd2Pos;
 
@@ -175,6 +194,10 @@ int main(int argc, char* argv[]){
 			SDL_WINDOW_SHOWN);
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+
+	Mix_Chunk *explosionSound = Mix_LoadWAV((audio_dir + "Explosion.wav").c_str());
 
 	SDL_Surface *surface = IMG_Load((images_dir + "background.png").c_str());
 
@@ -509,6 +532,13 @@ int main(int argc, char* argv[]){
 
 	Turrent turret2 = Turrent(renderer, images_dir.c_str(), audio_dir.c_str(), 900.0, 200.0);
 
+	for (int i = 0; i < 20; i++)
+	{
+		Explode tmpExplode(renderer, images_dir, -1000, -1000);
+
+		explodeList.push_back(tmpExplode);
+	}
+
 	enum GameState{MENU, INSTRUCTIONS, BACKSTORY, STARTGAME, LEVEL2, WIN,LOSE};
 
 	GameState gameState = MENU;
@@ -739,6 +769,10 @@ int main(int argc, char* argv[]){
 							{
 								if(SDL_HasIntersection(&player1.bulletList[i].posRect, &enemyList[j].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									enemyList[j].Reset();
 
 									player1.bulletList[i].Reset();
@@ -775,6 +809,10 @@ int main(int argc, char* argv[]){
 							{
 								if(SDL_HasIntersection(&player1.missileList[i].posRect, &enemyList[j].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									enemyList[j].Reset();
 
 									player1.missileList[i].Reset();
@@ -808,6 +846,10 @@ int main(int argc, char* argv[]){
 						if(SDL_HasIntersection(&player1.posRect,
 								&enemyList[i].posRect))
 						{
+							Mix_PlayChannel(-1, explosionSound, 0);
+
+							MakeExplosion(player1.posRect.x-32, player1.posRect.y-32);
+
 							enemyList[i].Reset();
 
 							player1.playerLives -= 1;
@@ -831,6 +873,10 @@ int main(int argc, char* argv[]){
 
 						if(player1.playerLives <= 0)
 						{
+							Mix_PlayChannel(-1, explosionSound, 0);
+
+							MakeExplosion(player1.posRect.x-32, player1.posRect.y-32);
+
 							startgame = false;
 							gameState = LOSE;
 							break;
@@ -847,6 +893,10 @@ int main(int argc, char* argv[]){
 
 						if(player1.playerLives <= 0)
 						{
+							Mix_PlayChannel(-1, explosionSound, 0);
+
+							MakeExplosion(player1.posRect.x-32, player1.posRect.y-32);
+
 							startgame = false;
 							gameState = LOSE;
 							break;

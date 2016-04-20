@@ -4,7 +4,7 @@ Turrent::Turrent(SDL_Renderer *renderer, string filePath, string audioPath, floa
 {
 	active = true;
 
-	fire = Mix_LoadWAV((audioPath + "Laser.wav").c_str());
+	fire = Mix_LoadWAV((audioPath + "Laser2.wav").c_str());
 
 	string basePath = filePath + "Aturret.png";
 
@@ -61,6 +61,8 @@ void Turrent::ResetTurret1()
 	barrelRect.x = 50;
 	barrelRect.y = 235;
 
+	health = 10;
+
 	active = true;
 }
 
@@ -71,6 +73,8 @@ void Turrent::ResetTurret2()
 
 	barrelRect.x = 940;
 	barrelRect.y = 235;
+
+	health = 10;
 
 	active = true;
 }

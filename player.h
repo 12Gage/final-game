@@ -27,6 +27,7 @@ using namespace std;
 #include <vector>
 #include "bullet.h"
 #include "missile.h"
+#include "beam.h"
 
 class Player{
 
@@ -53,6 +54,8 @@ public:
 	vector<Bullet>bulletList;
 
 	vector<Missile>missileList;
+
+	vector<Beam>beamList;
 
 	string playerPath;
 
@@ -94,6 +97,9 @@ public:
 private:
 
 	void CreateBullet();
+
 	void CreateMissile();
+
+	void CreateBeam();
 
 };

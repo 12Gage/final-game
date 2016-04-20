@@ -70,6 +70,8 @@ Player::Player(SDL_Renderer *renderer, int pNum, string filePath, string audioPa
 
 	string missilePath;
 
+	string beamPath;
+
 	if(playerNum == 0){
 
 		bulletPath = filePath + "bullet.png";
@@ -78,6 +80,11 @@ Player::Player(SDL_Renderer *renderer, int pNum, string filePath, string audioPa
 	if(playerNum == 0){
 
 		missilePath = filePath + "missile.png";
+	}
+
+	if(playerNum == 0){
+
+		beamPath = filePath + "beam.png";
 	}
 
 	for(int i = 0; i < 10; i++)
@@ -93,6 +100,14 @@ Player::Player(SDL_Renderer *renderer, int pNum, string filePath, string audioPa
 		Missile tmpMissile(renderer, missilePath, -1000, -1000);
 
 		missileList.push_back(tmpMissile);
+
+	}
+
+	for(int i = 0; i < 10; i++)
+	{
+		Beam tmpBeam(renderer, beamPath, -1000, -1000);
+
+		beamList.push_back(tmpBeam);
 
 	}
 
@@ -243,6 +258,14 @@ void Player::Update(float deltaTime, SDL_Renderer * renderer)
 		}
 	}
 
+	for(int i = 0; i < beamList.size(); i++)
+	{
+		if(beamList[i].active){
+
+			beamList[i].Update(deltaTime);
+		}
+	}
+
 	if(playerScore != oldScore){
 
 		UpdateScore(renderer);
@@ -310,6 +333,30 @@ void Player::CreateMissile(){
 	}
 }
 
+void Player::CreateBeam(){
+
+	for(int i = 0; i < beamList.size(); i++)
+	{
+		if(beamList[i].active == false){
+
+			Mix_PlayChannel(-1, laser, 0);
+
+			beamList[i].active = true;
+
+			beamList[i].posRect.x = (pos_X + (posRect.w/2));
+
+			beamList[i].posRect.x = (beamList[i].posRect.x - (beamList[i].posRect.w/2));
+			beamList[i].posRect.y = posRect.y;
+
+			beamList[i].pos_X = pos_X;
+			beamList[i].pos_Y = pos_Y;
+
+			break;
+		}
+
+	}
+}
+
 void Player::OnControllerButton(const SDL_ControllerButtonEvent event)
 {
 	if(event.which == 0 && playerNum == 0)
@@ -329,6 +376,16 @@ void Player::OnControllerButton(const SDL_ControllerButtonEvent event)
 			CreateMissile();
 
 			missiles -= 1;
+
+		}
+
+	}
+
+	if(event.which == 0 && playerNum == 0)
+	{
+		if(event.button == 2)
+		{
+			CreateBeam();
 
 		}
 
@@ -394,6 +451,14 @@ void Player::Draw(SDL_Renderer *renderer)
 		if(missileList[i].active){
 
 			missileList[i].Draw(renderer);
+		}
+	}
+
+	for(int i = 0; i < beamList.size(); i++)
+	{
+		if(beamList[i].active){
+
+			beamList[i].Draw(renderer);
 		}
 	}
 
