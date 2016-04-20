@@ -1,3 +1,6 @@
+#ifndef _TURRETBULLETH_
+#define _TURRETBULLETH_
+
 #include <string>
 #include <iostream>
 #include "math.h"
@@ -47,3 +50,5 @@ public:
 	void Start(SDL_Rect playerPos, SDL_Rect turretPos);
 
 };
+
+#endif _TURRETBULLETH_

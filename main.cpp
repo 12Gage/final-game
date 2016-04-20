@@ -53,6 +53,7 @@ string audio_dir = currentWorkingDirectory + "/final-game/";
 #include "turrent.h"
 #include "pickup.h"
 #include "explode.h"
+#include "bigboss.h"
 
 vector<Enemy> enemyList;
 
@@ -510,13 +511,24 @@ int main(int argc, char* argv[]){
 	gaugeFill3Pos.w = 19;
 	gaugeFill3Pos.h = 9;
 
+	SDL_Texture *pickup2 = IMG_LoadTexture(renderer, (images_dir + "pickup2.png").c_str());
+	SDL_Rect pickup2Pos;
+	pickup2Pos.x = 600;
+	pickup2Pos.y = 600;
+	pickup2Pos.w = 9;
+	pickup2Pos.h = 19;
+
 	bool havegaugeFill1 = false;
 	bool havegaugeFill2 = false;
 	bool havegaugeFill3 = false;
 
+	bool havemissilePickup = false;
+
 	Pickup gauge1 = Pickup(renderer, images_dir.c_str(), 0,200.0f,600.0f);
 	Pickup gauge2 = Pickup(renderer, images_dir.c_str(), 1,200.0f,600.0f);
 	Pickup gauge3 = Pickup(renderer, images_dir.c_str(), 2,200.0f,600.0f);
+
+	Pickup missilePickup = Pickup(renderer, images_dir.c_str(), 3,600.0f,600.0f);
 
 	SDL_GameController* gGameController = NULL;
 
@@ -529,8 +541,9 @@ int main(int argc, char* argv[]){
 	Player player1 = Player(renderer, 0, images_dir.c_str(), audio_dir.c_str(), 250.0,500.0);
 
 	Turrent turret1 = Turrent(renderer, images_dir.c_str(), audio_dir.c_str(), 10.0, 200.0);
-
 	Turrent turret2 = Turrent(renderer, images_dir.c_str(), audio_dir.c_str(), 900.0, 200.0);
+
+	BigBoss boss = BigBoss(renderer, images_dir.c_str(), audio_dir.c_str(), 325.0, 25.0);
 
 	for (int i = 0; i < 20; i++)
 	{
@@ -925,6 +938,13 @@ int main(int argc, char* argv[]){
 					gauge3.pickupRect.y = -5000;
 				}
 
+				if(SDL_HasIntersection(&player1.posRect, &missilePickup.pickupRect)){
+					havemissilePickup = true;
+					missilePickup.active = false;
+					missilePickup.pickupRect.x = -5000;
+					missilePickup.pickupRect.y = -5000;
+				}
+
 				SDL_RenderClear(renderer);
 
 				SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
@@ -969,6 +989,15 @@ int main(int argc, char* argv[]){
 
 				if(gauge3.active)
 					gauge3.Draw(renderer);
+				}
+
+				if(player1.missiles <= 0)
+				{
+					if(havemissilePickup)
+					SDL_RenderCopy(renderer, pickup2, NULL, &pickup2Pos);
+
+				if(missilePickup.active)
+					missilePickup.Draw(renderer);
 				}
 
 				if (player1.playerScore >= 1000)
@@ -1050,6 +1079,8 @@ int main(int argc, char* argv[]){
 				turret1.Update(deltaTime, player1.posRect);
 
 				turret2.Update(deltaTime, player1.posRect);
+
+				boss.Update(deltaTime, player1.posRect);
 
 				if (player1.active == true)
 				{
@@ -1175,6 +1206,8 @@ int main(int argc, char* argv[]){
 				turret1.Draw(renderer);
 
 				turret2.Draw(renderer);
+
+				boss.Draw(renderer);
 
 				if (player1.playerScore >= 100)
 				{
