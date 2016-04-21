@@ -73,6 +73,8 @@ public:
 
 	void RemoveHealthMissile();
 
+	void RemoveHealthBeam();
+
 	float posB_X, posB_Y, posT_X, posT_Y;
 };
 

@@ -97,6 +97,16 @@ void Turrent::RemoveHealthMissile()
 	}
 }
 
+void Turrent::RemoveHealthBeam(){
+
+	health -= 10;
+
+	if(health <= 0){
+		Reset();
+	}
+
+}
+
 void Turrent::Reset()
 {
 	baseRect.x = -1000;

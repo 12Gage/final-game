@@ -45,7 +45,7 @@ BigBoss::BigBoss(SDL_Renderer *renderer, string filePath, string audioPath, floa
 	posT_X = barrelRect.x;
 	posT_Y = barrelRect.y;
 
-	health = 10;
+	health = 100;
 
 }
 
@@ -65,6 +65,16 @@ void BigBoss::RemoveHealthMissile()
 	if(health <= 0){
 		Reset();
 	}
+}
+
+void BigBoss::RemoveHealthBeam(){
+
+	health -= 10;
+
+	if(health <= 0){
+		Reset();
+	}
+
 }
 
 void BigBoss::Reset()

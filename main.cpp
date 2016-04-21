@@ -700,9 +700,24 @@ int main(int argc, char* argv[]){
 				player1.missileList[i].Reset();
 			}
 
+			for (int i = 0; i < player1.beamList.size(); i++)
+			{
+				player1.beamList[i].Reset();
+			}
+
+			for(int i = 0; i < turret1.bulletList.size(); i++)
+			{
+				turret1.bulletList[i].Reset();
+			}
+
+			for(int i = 0; i < turret2.bulletList.size(); i++)
+			{
+				turret2.bulletList[i].Reset();
+			}
+
 			startgame = true;
 
-			for(int i = 0; i < 5; i++)
+			for(int i = 0; i < 3; i++)
 			{
 				Enemy tmpEnemy(renderer, images_dir);
 
@@ -764,7 +779,7 @@ int main(int argc, char* argv[]){
 				{
 					for(int i = 0; i < enemyList.size(); i++)
 					{
-						enemyList[i].Update(deltaTime);
+						enemyList[i].Update(deltaTime, player1.posRect);
 					}
 
 					for(int i = 0; i < player1.bulletList.size(); i++)
@@ -854,6 +869,47 @@ int main(int argc, char* argv[]){
 							}
 						}
 					}
+
+					for(int i = 0; i < player1.beamList.size(); i++)
+					{
+						if(player1.beamList[i].active == true)
+						{
+							for(int j = 0; j < enemyList.size(); j ++)
+							{
+								if(SDL_HasIntersection(&player1.beamList[i].posRect, &enemyList[j].posRect))
+								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
+									enemyList[j].Reset();
+
+									player1.beamList[i].Reset();
+
+									player1.playerScore +=100;
+								}
+
+								if(SDL_HasIntersection(&turret1.baseRect, &player1.beamList[i].posRect))
+								{
+									player1.beamList[i].Reset();
+									if(turret1.active == true)
+									{
+										turret1.RemoveHealthBeam();
+									}
+								}
+
+								if(SDL_HasIntersection(&turret2.baseRect, &player1.beamList[i].posRect))
+								{
+									player1.missileList[i].Reset();
+									if(turret2.active == true)
+									{
+										turret2.RemoveHealthBeam();
+									}
+								}
+							}
+						}
+					}
+
 
 					for(int i = 0; i < enemyList.size(); i++)
 					{
@@ -1021,6 +1077,7 @@ int main(int argc, char* argv[]){
 
 			turret2.ResetTurret2();
 
+
 			for (int i = 0; i < player1.bulletList.size(); i++)
 			{
 				player1.bulletList[i].Reset();
@@ -1029,6 +1086,21 @@ int main(int argc, char* argv[]){
 			for (int i = 0; i < player1.missileList.size(); i++)
 			{
 				player1.missileList[i].Reset();
+			}
+
+			for (int i = 0; i < player1.beamList.size(); i++)
+			{
+				player1.beamList[i].Reset();
+			}
+
+			for(int i = 0; i < turret1.bulletList.size(); i++)
+			{
+				turret1.bulletList[i].Reset();
+			}
+
+			for(int i = 0; i < turret2.bulletList.size(); i++)
+			{
+				turret2.bulletList[i].Reset();
 			}
 
 			level2 = true;
@@ -1112,6 +1184,15 @@ int main(int argc, char* argv[]){
 										turret2.RemoveHealthBullet();
 									}
 								}
+
+								if (SDL_HasIntersection(&boss.baseRect, &player1.bulletList[i].posRect))
+								{
+									player1.bulletList[i].Reset();
+									if (boss.active == true)
+									{
+										boss.RemoveHealthBullet();
+									}
+								}
 							}
 						}
 					}
@@ -1139,6 +1220,52 @@ int main(int argc, char* argv[]){
 										turret2.RemoveHealthMissile();
 									}
 								}
+
+								if (SDL_HasIntersection(&boss.baseRect, &player1.missileList[i].posRect))
+								{
+									player1.missileList[i].Reset();
+									if (boss.active == true)
+									{
+										boss.RemoveHealthMissile();
+									}
+								}
+							}
+						}
+					}
+
+					for (int i = 0; i < player1.beamList.size(); i++)
+					{
+						if (player1.beamList[i].active == true)
+						{
+							for (int j = 0; j < enemyList.size(); j++)
+							{
+								if (SDL_HasIntersection(&turret1.baseRect, &player1.beamList[i].posRect))
+								{
+									player1.beamList[i].Reset();
+									if (turret1.active == true)
+									{
+										turret1.RemoveHealthBeam();
+									}
+								}
+
+								if (SDL_HasIntersection(&turret2.baseRect, &player1.beamList[i].posRect))
+								{
+									player1.beamList[i].Reset();
+									if (turret2.active == true)
+									{
+										turret2.RemoveHealthBeam();
+									}
+
+								}
+
+								if (SDL_HasIntersection(&boss.baseRect, &player1.beamList[i].posRect))
+								{
+									player1.beamList[i].Reset();
+									if (boss.active == true)
+									{
+										boss.RemoveHealthBeam();
+									}
+								}
 							}
 						}
 					}
@@ -1164,6 +1291,22 @@ int main(int argc, char* argv[]){
 				{
 					if (SDL_HasIntersection(&player1.posRect, &turret2.bulletList[i].posRect)) {
 						turret2.bulletList[i].Reset();
+
+						player1.playerLives -= 1;
+
+						if (player1.playerLives <= 0)
+						{
+							level2 = false;
+							gameState = LOSE;
+							break;
+						}
+					}
+				}
+
+				for (int i = 0; i < boss.bulletList.size(); i++)
+				{
+					if (SDL_HasIntersection(&player1.posRect, &boss.bulletList[i].posRect)) {
+						boss.bulletList[i].Reset();
 
 						player1.playerLives -= 1;
 
@@ -1238,6 +1381,13 @@ int main(int argc, char* argv[]){
 
 					if (gauge3.active)
 						gauge3.Draw(renderer);
+				}
+
+				if (boss.health <= 0)
+				{
+					level2 = false;
+					gameState = WIN;
+					break;
 				}
 
 				SDL_RenderPresent(renderer);

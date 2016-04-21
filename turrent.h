@@ -73,6 +73,8 @@ public:
 
 	void RemoveHealthMissile();
 
+	void RemoveHealthBeam();
+
 	void ResetTurret1();
 
 	void ResetTurret2();

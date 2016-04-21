@@ -23,6 +23,9 @@ using namespace std;
 class Enemy{
 
 public:
+
+	bool active;
+
 	SDL_Texture *texture;
 
 	SDL_Rect posRect;
@@ -37,13 +40,21 @@ public:
 
 	SDL_Point center;
 
+	float x,y,tankangle;
+
 	Enemy(SDL_Renderer *renderer, string filePath);
 
-	void Update(float deltaTime);
+	void Update(float deltaTime, SDL_Rect playerRect);
 
 	void Draw(SDL_Renderer *renderer);
 
 	void Reset();
+
+	void enemyMoveX(float playerSpeed, float deltaTime);
+
+	void enemyMoveY(float plsyerSpeed, float deltaTime);
+
+	float posT_X, posT_Y;
 
 	~Enemy();
 };

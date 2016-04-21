@@ -2,6 +2,8 @@
 
 Enemy::Enemy(SDL_Renderer *renderer, string filePath)
 {
+	active = false;
+
 	string enemyPath = filePath + "Aenemy.png";
 
 	SDL_Surface *surface = IMG_Load(enemyPath.c_str());
@@ -39,7 +41,22 @@ void Enemy::Reset(){
 	pos_Y = posRect.y;
 }
 
-void Enemy::Update(float deltaTime)
+void Enemy::enemyMoveX(float playerSpeed, float deltaTime)
+{
+	posT_X += (playerSpeed) *deltaTime;
+
+	posRect.x = (int)(posT_X + 0.5f);
+}
+
+void Enemy::enemyMoveY(float playerSpeed, float deltaTime)
+{
+	posT_Y += (playerSpeed) *deltaTime;
+
+	posRect.y = (int)(posT_Y + 0.5f);
+
+}
+
+void Enemy::Update(float deltaTime, SDL_Rect playerRect)
 {
 	pos_Y += (speed *yDir) * deltaTime;
 
@@ -51,6 +68,34 @@ void Enemy::Update(float deltaTime)
 	}
 
 	angle += .1;
+
+	double distancex = (posRect.x - playerRect.x) * (posRect.x - playerRect.x);
+	double distancey = (posRect.y - playerRect.y) * (posRect.y - playerRect.y);
+
+	double calcdistance = sqrt(distancex + distancey);
+
+	if(calcdistance <= 250){
+		active = true;
+	}else{
+		active = false;
+	}
+
+	if(active){
+		x = (playerRect.x + (playerRect.w/2)) - (posRect.x + (posRect.w/2));
+		y = (playerRect.y + (playerRect.h/2)) - (posRect.y + (posRect.h/2));
+		tankangle = atan2(y,x) * 180/3.14;
+
+		float radians = (tankangle * 3.14)/180;
+
+		float move_x = speed * cos(radians);
+		float move_y = speed * sin(radians);
+
+		posT_X += (move_x) * deltaTime;
+		posT_Y += (move_y) * deltaTime;
+
+		posRect.x = (int)(posT_X + 0.5f);
+		posRect.y = (int)(posT_Y + 0.5f);
+	}
 
 }
 
