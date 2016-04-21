@@ -511,22 +511,13 @@ int main(int argc, char* argv[]){
 	gaugeFill3Pos.w = 19;
 	gaugeFill3Pos.h = 9;
 
-	SDL_Texture *pickup2 = IMG_LoadTexture(renderer, (images_dir + "pickup2.png").c_str());
-	SDL_Rect pickup2Pos;
-	pickup2Pos.x = 600;
-	pickup2Pos.y = 600;
-	pickup2Pos.w = 9;
-	pickup2Pos.h = 19;
-
 	bool havegaugeFill1 = false;
 	bool havegaugeFill2 = false;
 	bool havegaugeFill3 = false;
 
-	bool havemissilePickup = false;
-
-	Pickup gauge1 = Pickup(renderer, images_dir.c_str(), 0,200.0f,600.0f);
+	Pickup gauge1 = Pickup(renderer, images_dir.c_str(), 0,200.0f,500.0f);
 	Pickup gauge2 = Pickup(renderer, images_dir.c_str(), 1,200.0f,600.0f);
-	Pickup gauge3 = Pickup(renderer, images_dir.c_str(), 2,200.0f,600.0f);
+	Pickup gauge3 = Pickup(renderer, images_dir.c_str(), 2,200.0f,700.0f);
 
 	Pickup missilePickup = Pickup(renderer, images_dir.c_str(), 3,600.0f,600.0f);
 
@@ -538,7 +529,7 @@ int main(int argc, char* argv[]){
 
 	SDL_Event e;
 
-	Player player1 = Player(renderer, 0, images_dir.c_str(), audio_dir.c_str(), 250.0,500.0);
+	Player player1 = Player(renderer, 0, images_dir.c_str(), audio_dir.c_str(), 500.0,500.0);
 
 	Turrent turret1 = Turrent(renderer, images_dir.c_str(), audio_dir.c_str(), 10.0, 200.0);
 	Turrent turret2 = Turrent(renderer, images_dir.c_str(), audio_dir.c_str(), 900.0, 200.0);
@@ -697,6 +688,8 @@ int main(int argc, char* argv[]){
 
 			turret2.ResetTurret2();
 
+			gauge1.active = true;
+
 			for(int i = 0; i < player1.bulletList.size(); i++)
 			{
 				player1.bulletList[i].Reset();
@@ -795,6 +788,10 @@ int main(int argc, char* argv[]){
 
 								if(SDL_HasIntersection(&turret1.baseRect, &player1.bulletList[i].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									player1.bulletList[i].Reset();
 									if(turret1.active == true)
 									{
@@ -804,6 +801,10 @@ int main(int argc, char* argv[]){
 
 								if(SDL_HasIntersection(&turret2.baseRect, &player1.bulletList[i].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									player1.bulletList[i].Reset();
 									if(turret2.active == true)
 									{
@@ -918,8 +919,8 @@ int main(int argc, char* argv[]){
 				}
 
 				if(SDL_HasIntersection(&player1.posRect, &gauge1.pickupRect)){
-					havegaugeFill1 = true;
 					gauge1.active = false;
+					havegaugeFill1 = true;
 					gauge1.pickupRect.x = -5000;
 					gauge1.pickupRect.y = -5000;
 				}
@@ -939,10 +940,9 @@ int main(int argc, char* argv[]){
 				}
 
 				if(SDL_HasIntersection(&player1.posRect, &missilePickup.pickupRect)){
-					havemissilePickup = true;
-					missilePickup.active = false;
 					missilePickup.pickupRect.x = -5000;
 					missilePickup.pickupRect.y = -5000;
+					player1.missiles = 3;
 				}
 
 				SDL_RenderClear(renderer);
@@ -966,38 +966,42 @@ int main(int argc, char* argv[]){
 
 				if(player1.playerScore >= 100)
 				{
-					if(havegaugeFill1)
-					SDL_RenderCopy(renderer, gaugeFill1, NULL, &gaugeFill1Pos);
+					gauge1.pickupRect.x = 200;
+					gauge1.pickupRect.y = 500;
+					
+					if (havegaugeFill1)
+						SDL_RenderCopy(renderer, gaugeFill1, NULL, &gaugeFill1Pos);
 
-				if(gauge1.active)
-					gauge1.Draw(renderer);
+					if(gauge1.active)
+						gauge1.Draw(renderer);
 				}
 
 				if(player1.playerScore >= 200)
 				{
+
 					if(havegaugeFill2)
 					SDL_RenderCopy(renderer, gaugeFill2, NULL, &gaugeFill2Pos);
-
-				if(gauge2.active)
-					gauge2.Draw(renderer);
+					
+					if(gauge2.active)
+						gauge2.Draw(renderer);
 				}
 
 				if(player1.playerScore >= 300)
 				{
 					if(havegaugeFill3)
 					SDL_RenderCopy(renderer, gaugeFill3, NULL, &gaugeFill3Pos);
-
-				if(gauge3.active)
-					gauge3.Draw(renderer);
+					
+					if(gauge3.active)
+						gauge3.Draw(renderer);
 				}
 
 				if(player1.missiles <= 0)
 				{
-					if(havemissilePickup)
-					SDL_RenderCopy(renderer, pickup2, NULL, &pickup2Pos);
-
-				if(missilePickup.active)
-					missilePickup.Draw(renderer);
+					missilePickup.pickupRect.x = 600;
+					missilePickup.pickupRect.y = 600;
+					
+					if(missilePickup.active)
+						missilePickup.Draw(renderer);
 				}
 
 				if (player1.playerScore >= 1000)

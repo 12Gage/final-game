@@ -117,7 +117,7 @@ void Player::Reset() {
 
 	if (playerNum == 0) {
 
-		posRect.x = 250.0;
+		posRect.x = 500.0;
 		posRect.y = 500.0;
 	}
 

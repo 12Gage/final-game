@@ -6,25 +6,25 @@ Pickup::Pickup(SDL_Renderer *renderer, string filePath, int pickup2, float x, fl
 
 	if(pickup2 == 0){
 
-		string basePath = filePath + "gaugeFill.png";
+		string basePath = filePath + "pickup2.png";
 
 		pickup = IMG_LoadTexture(renderer, basePath.c_str());
 
 	}else if(pickup2 == 1){
 
-		string basePath = filePath + "gaugeFill.png";
+		string basePath = filePath + "pickup2.png";
 
 		pickup = IMG_LoadTexture(renderer, basePath.c_str());
 
 	}else if(pickup2 == 2){
 
-		string basePath = filePath + "gaugeFill.png";
+		string basePath = filePath + "pickup2.png";
 
 		pickup = IMG_LoadTexture(renderer, basePath.c_str());
 
 	}else if(pickup2 == 3){
 
-			string basePath = filePath + "pickup2.png";
+			string basePath = filePath + "missile pickup.png";
 
 			pickup = IMG_LoadTexture(renderer, basePath.c_str());
 
