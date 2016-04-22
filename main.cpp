@@ -198,7 +198,7 @@ int main(int argc, char* argv[]){
 
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 
-	Mix_Music *bgm = Mix_LoadMUS((audio_dir + "background.mp3").c_str());
+	Mix_Music *bgm = Mix_LoadMUS((audio_dir + "Space.mp3").c_str());
 
 	if (!Mix_PlayingMusic())
 		Mix_PlayMusic(bgm, -1);
