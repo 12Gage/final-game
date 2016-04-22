@@ -1026,6 +1026,14 @@ int main(int argc, char* argv[]){
 					player1.missiles = 3;
 				}
 
+				for (int i = 0; i < explodeList.size(); i++)
+				{
+					if (explodeList[i].active == true) {
+
+						explodeList[i].Update(deltaTime);
+					}
+				}
+
 				SDL_RenderClear(renderer);
 
 				SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
@@ -1090,6 +1098,14 @@ int main(int argc, char* argv[]){
 					startgame = false;
 					gameState = LEVEL2;
 					break;
+				}
+
+				for (int i = 0; i < explodeList.size(); i++)
+				{
+					if (explodeList[i].active == true) {
+
+						explodeList[i].Draw(renderer);
+					}
 				}
 
 				SDL_RenderPresent(renderer);

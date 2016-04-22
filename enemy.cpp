@@ -69,8 +69,8 @@ void Enemy::Update(float deltaTime, SDL_Rect playerRect)
 
 	angle += .1;
 
-	double distancex = (posRect.x - playerRect.x) * (posRect.x - playerRect.x);
-	double distancey = (posRect.y - playerRect.y) * (posRect.y - playerRect.y);
+	double distancex = (posRect.x + playerRect.x) * (posRect.x + playerRect.x);
+	double distancey = (posRect.y + playerRect.y) * (posRect.y + playerRect.y);
 
 	double calcdistance = sqrt(distancex + distancey);
 
