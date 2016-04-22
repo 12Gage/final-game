@@ -1392,6 +1392,13 @@ int main(int argc, char* argv[]){
 
 						MakeExplosion(player1.posRect.x - 32, player1.posRect.y - 32);
 
+						if (player1.playerLives >= 0 && boss.health <= 0)
+						{
+							level2 = false;
+							gameState = WIN;
+							break;
+						}
+
 						if (player1.playerLives <= 0)
 						{
 							level2 = false;
@@ -1420,6 +1427,12 @@ int main(int argc, char* argv[]){
 					gauge3.active = false;
 					gauge3.pickupRect.x = -5000;
 					gauge3.pickupRect.y = -5000;
+				}
+
+				if (SDL_HasIntersection(&player1.posRect, &missilePickup.pickupRect)) {
+					missilePickup.pickupRect.x = -5000;
+					missilePickup.pickupRect.y = -5000;
+					player1.missiles = 3;
 				}
 
 				SDL_RenderClear(renderer);
@@ -1465,11 +1478,13 @@ int main(int argc, char* argv[]){
 						gauge3.Draw(renderer);
 				}
 
-				if (boss.health <= 0)
+				if (player1.missiles <= 0)
 				{
-					level2 = false;
-					gameState = WIN;
-					break;
+					missilePickup.pickupRect.x = 600;
+					missilePickup.pickupRect.y = 600;
+
+					if (missilePickup.active)
+						missilePickup.Draw(renderer);
 				}
 
 				SDL_RenderPresent(renderer);
