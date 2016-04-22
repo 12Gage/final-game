@@ -492,29 +492,29 @@ int main(int argc, char* argv[]){
 	SDL_Rect gaugeBlankRect;
 	gaugeBlankRect.x = 370;
 	gaugeBlankRect.y = 10;
-	gaugeBlankRect.w = 19;
-	gaugeBlankRect.h = 9;
+	gaugeBlankRect.w = 50;
+	gaugeBlankRect.h = 40;
 
 	SDL_Texture *gaugeFill1 = IMG_LoadTexture(renderer, (images_dir + "gaugeFill1.png").c_str());
 	SDL_Rect gaugeFill1Pos;
 	gaugeFill1Pos.x = 370;
 	gaugeFill1Pos.y = 10;
-	gaugeFill1Pos.w = 19;
-	gaugeFill1Pos.h = 9;
+	gaugeFill1Pos.w = 50;
+	gaugeFill1Pos.h = 40;
 
 	SDL_Texture *gaugeFill2 = IMG_LoadTexture(renderer, (images_dir + "gaugeFill2.png").c_str());
 	SDL_Rect gaugeFill2Pos;
 	gaugeFill2Pos.x = 370;
 	gaugeFill2Pos.y = 10;
-	gaugeFill2Pos.w = 19;
-	gaugeFill2Pos.h = 9;
+	gaugeFill2Pos.w = 50;
+	gaugeFill2Pos.h = 40;
 
 	SDL_Texture *gaugeFill3 = IMG_LoadTexture(renderer, (images_dir + "gaugeFill3.png").c_str());
 	SDL_Rect gaugeFill3Pos;
 	gaugeFill3Pos.x = 370;
 	gaugeFill3Pos.y = 10;
-	gaugeFill3Pos.w = 19;
-	gaugeFill3Pos.h = 9;
+	gaugeFill3Pos.w = 50;
+	gaugeFill3Pos.h = 40;
 
 	bool havegaugeFill1 = false;
 	bool havegaugeFill2 = false;
@@ -803,7 +803,7 @@ int main(int argc, char* argv[]){
 
 									player1.bulletList[i].Reset();
 
-									player1.playerScore +=100;
+									player1.playerScore +=1000;
 								}
 
 								if(SDL_HasIntersection(&turret1.baseRect, &player1.bulletList[i].posRect))
@@ -851,7 +851,7 @@ int main(int argc, char* argv[]){
 
 									player1.missileList[i].Reset();
 
-									player1.playerScore +=100;
+									player1.playerScore +=1000;
 								}
 
 								if(SDL_HasIntersection(&turret1.baseRect, &player1.missileList[i].posRect))
@@ -901,7 +901,7 @@ int main(int argc, char* argv[]){
 
 									player1.beamList[i].Reset();
 
-									player1.playerScore +=100;
+									player1.playerScore +=1000;
 								}
 
 								if(SDL_HasIntersection(&turret1.baseRect, &player1.beamList[i].posRect))
@@ -1045,7 +1045,7 @@ int main(int argc, char* argv[]){
 
 				turret2.Draw(renderer);
 
-				if(player1.playerScore >= 100)
+				if(player1.playerScore >= 200)
 				{
 					gauge1.pickupRect.x = 200;
 					gauge1.pickupRect.y = 500;
@@ -1057,7 +1057,7 @@ int main(int argc, char* argv[]){
 						gauge1.Draw(renderer);
 				}
 
-				if(player1.playerScore >= 200)
+				if(player1.playerScore >= 400)
 				{
 
 					if(havegaugeFill2)
@@ -1067,7 +1067,7 @@ int main(int argc, char* argv[]){
 						gauge2.Draw(renderer);
 				}
 
-				if(player1.playerScore >= 300)
+				if(player1.playerScore >= 600)
 				{
 					if(havegaugeFill3)
 					SDL_RenderCopy(renderer, gaugeFill3, NULL, &gaugeFill3Pos);
@@ -1085,7 +1085,7 @@ int main(int argc, char* argv[]){
 						missilePickup.Draw(renderer);
 				}
 
-				if (player1.playerScore >= 1000)
+				if (player1.playerScore >= 10000)
 				{
 					startgame = false;
 					gameState = LEVEL2;
@@ -1101,6 +1101,8 @@ int main(int argc, char* argv[]){
 			turret1.ResetTurret1();
 
 			turret2.ResetTurret2();
+
+			boss.ResetBoss();
 
 
 			for (int i = 0; i < player1.bulletList.size(); i++)
@@ -1392,13 +1394,6 @@ int main(int argc, char* argv[]){
 
 						MakeExplosion(player1.posRect.x - 32, player1.posRect.y - 32);
 
-						if (player1.playerLives >= 0 && boss.health <= 0)
-						{
-							level2 = false;
-							gameState = WIN;
-							break;
-						}
-
 						if (player1.playerLives <= 0)
 						{
 							level2 = false;
@@ -1485,6 +1480,13 @@ int main(int argc, char* argv[]){
 
 					if (missilePickup.active)
 						missilePickup.Draw(renderer);
+				}
+
+				if (player1.playerLives >= 0 && boss.baseRect.x == -1000)
+				{
+					level2 = false;
+					gameState = WIN;
+					break;
 				}
 
 				SDL_RenderPresent(renderer);

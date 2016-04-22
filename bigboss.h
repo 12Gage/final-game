@@ -75,6 +75,8 @@ public:
 
 	void RemoveHealthBeam();
 
+	void ResetBoss();
+
 	float posB_X, posB_Y, posT_X, posT_Y;
 };
 

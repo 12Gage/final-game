@@ -87,9 +87,20 @@ void BigBoss::Reset()
 
 	posT_X = barrelRect.x;
 
-	health = 10;
+	health = 100;
 
 	active = false;
+}
+
+void BigBoss::ResetBoss()
+{
+	baseRect.x = 325.0;
+
+	baseRect.y = 25.0;
+
+	health = 100;
+
+	active = true;
 }
 
 void BigBoss::TankMoveX(float tankSpeed, float deltaTime)
