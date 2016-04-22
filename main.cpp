@@ -198,6 +198,11 @@ int main(int argc, char* argv[]){
 
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 
+	Mix_Music *bgm = Mix_LoadMUS((audio_dir + "background.mp3").c_str());
+
+	if (!Mix_PlayingMusic())
+		Mix_PlayMusic(bgm, -1);
+
 	Mix_Chunk *explosionSound = Mix_LoadWAV((audio_dir + "Explosion.wav").c_str());
 
 	SDL_Surface *surface = IMG_Load((images_dir + "background.png").c_str());
@@ -851,7 +856,12 @@ int main(int argc, char* argv[]){
 
 								if(SDL_HasIntersection(&turret1.baseRect, &player1.missileList[i].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									player1.missileList[i].Reset();
+
 									if(turret1.active == true)
 									{
 										turret1.RemoveHealthMissile();
@@ -860,7 +870,12 @@ int main(int argc, char* argv[]){
 
 								if(SDL_HasIntersection(&turret2.baseRect, &player1.missileList[i].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									player1.missileList[i].Reset();
+
 									if(turret2.active == true)
 									{
 										turret2.RemoveHealthMissile();
@@ -891,7 +906,12 @@ int main(int argc, char* argv[]){
 
 								if(SDL_HasIntersection(&turret1.baseRect, &player1.beamList[i].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									player1.beamList[i].Reset();
+
 									if(turret1.active == true)
 									{
 										turret1.RemoveHealthBeam();
@@ -900,7 +920,12 @@ int main(int argc, char* argv[]){
 
 								if(SDL_HasIntersection(&turret2.baseRect, &player1.beamList[i].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									player1.missileList[i].Reset();
+
 									if(turret2.active == true)
 									{
 										turret2.RemoveHealthBeam();
@@ -941,12 +966,12 @@ int main(int argc, char* argv[]){
 
 						player1.playerLives -= 1;
 
+						Mix_PlayChannel(-1, explosionSound, 0);
+
+						MakeExplosion(player1.posRect.x - 32, player1.posRect.y - 32);
+
 						if(player1.playerLives <= 0)
 						{
-							Mix_PlayChannel(-1, explosionSound, 0);
-
-							MakeExplosion(player1.posRect.x-32, player1.posRect.y-32);
-
 							startgame = false;
 							gameState = LOSE;
 							break;
@@ -961,12 +986,12 @@ int main(int argc, char* argv[]){
 
 						player1.playerLives -= 1;
 
+						Mix_PlayChannel(-1, explosionSound, 0);
+
+						MakeExplosion(player1.posRect.x - 32, player1.posRect.y - 32);
+
 						if(player1.playerLives <= 0)
 						{
-							Mix_PlayChannel(-1, explosionSound, 0);
-
-							MakeExplosion(player1.posRect.x-32, player1.posRect.y-32);
-
 							startgame = false;
 							gameState = LOSE;
 							break;
@@ -1169,7 +1194,12 @@ int main(int argc, char* argv[]){
 
 								if (SDL_HasIntersection(&turret1.baseRect, &player1.bulletList[i].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									player1.bulletList[i].Reset();
+
 									if (turret1.active == true)
 									{
 										turret1.RemoveHealthBullet();
@@ -1178,7 +1208,12 @@ int main(int argc, char* argv[]){
 
 								if (SDL_HasIntersection(&turret2.baseRect, &player1.bulletList[i].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									player1.bulletList[i].Reset();
+
 									if (turret2.active == true)
 									{
 										turret2.RemoveHealthBullet();
@@ -1187,7 +1222,12 @@ int main(int argc, char* argv[]){
 
 								if (SDL_HasIntersection(&boss.baseRect, &player1.bulletList[i].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									player1.bulletList[i].Reset();
+
 									if (boss.active == true)
 									{
 										boss.RemoveHealthBullet();
@@ -1205,7 +1245,12 @@ int main(int argc, char* argv[]){
 							{
 								if (SDL_HasIntersection(&turret1.baseRect, &player1.missileList[i].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									player1.missileList[i].Reset();
+
 									if (turret1.active == true)
 									{
 										turret1.RemoveHealthMissile();
@@ -1214,7 +1259,12 @@ int main(int argc, char* argv[]){
 
 								if (SDL_HasIntersection(&turret2.baseRect, &player1.missileList[i].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									player1.missileList[i].Reset();
+
 									if (turret2.active == true)
 									{
 										turret2.RemoveHealthMissile();
@@ -1223,7 +1273,12 @@ int main(int argc, char* argv[]){
 
 								if (SDL_HasIntersection(&boss.baseRect, &player1.missileList[i].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									player1.missileList[i].Reset();
+
 									if (boss.active == true)
 									{
 										boss.RemoveHealthMissile();
@@ -1241,7 +1296,12 @@ int main(int argc, char* argv[]){
 							{
 								if (SDL_HasIntersection(&turret1.baseRect, &player1.beamList[i].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									player1.beamList[i].Reset();
+
 									if (turret1.active == true)
 									{
 										turret1.RemoveHealthBeam();
@@ -1250,7 +1310,12 @@ int main(int argc, char* argv[]){
 
 								if (SDL_HasIntersection(&turret2.baseRect, &player1.beamList[i].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									player1.beamList[i].Reset();
+
 									if (turret2.active == true)
 									{
 										turret2.RemoveHealthBeam();
@@ -1260,7 +1325,12 @@ int main(int argc, char* argv[]){
 
 								if (SDL_HasIntersection(&boss.baseRect, &player1.beamList[i].posRect))
 								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+
 									player1.beamList[i].Reset();
+
 									if (boss.active == true)
 									{
 										boss.RemoveHealthBeam();
@@ -1278,6 +1348,10 @@ int main(int argc, char* argv[]){
 
 						player1.playerLives -= 1;
 
+						Mix_PlayChannel(-1, explosionSound, 0);
+
+						MakeExplosion(player1.posRect.x - 32, player1.posRect.y - 32);
+
 						if (player1.playerLives <= 0)
 						{
 							level2 = false;
@@ -1294,6 +1368,10 @@ int main(int argc, char* argv[]){
 
 						player1.playerLives -= 1;
 
+						Mix_PlayChannel(-1, explosionSound, 0);
+
+						MakeExplosion(player1.posRect.x - 32, player1.posRect.y - 32);
+
 						if (player1.playerLives <= 0)
 						{
 							level2 = false;
@@ -1309,6 +1387,10 @@ int main(int argc, char* argv[]){
 						boss.bulletList[i].Reset();
 
 						player1.playerLives -= 1;
+
+						Mix_PlayChannel(-1, explosionSound, 0);
+
+						MakeExplosion(player1.posRect.x - 32, player1.posRect.y - 32);
 
 						if (player1.playerLives <= 0)
 						{

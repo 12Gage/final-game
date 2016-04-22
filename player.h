@@ -33,7 +33,7 @@ class Player{
 
 public:
 
-	bool active;
+	bool active, activeMissile;
 
 	int playerScore, oldScore, playerLives, oldLives, missiles, oldMissiles;
 

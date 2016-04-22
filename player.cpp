@@ -19,6 +19,16 @@ Player::Player(SDL_Renderer *renderer, int pNum, string filePath, string audioPa
 	oldMissiles = 0;
 	missiles = 3;
 
+	if (missiles == 3)
+	{
+		activeMissile = true;
+	}
+
+	if (missiles == 0)
+	{
+		activeMissile = false;
+	}
+
 	TTF_Init();
 
 	font = TTF_OpenFont((audioPath + "Long_Shot.ttf").c_str(), 40);
@@ -308,6 +318,8 @@ void Player::CreateBullet(){
 
 	}
 }
+
+
 
 void Player::CreateMissile(){
 
