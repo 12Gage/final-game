@@ -28,7 +28,19 @@ Pickup::Pickup(SDL_Renderer *renderer, string filePath, int pickup2, float x, fl
 
 			pickup = IMG_LoadTexture(renderer, basePath.c_str());
 
-		}
+	}else if (pickup2 == 4) {
+
+		string basePath = filePath + "playerLife.png";
+
+		pickup = IMG_LoadTexture(renderer, basePath.c_str());
+
+	}else if (pickup2 == 5) {
+
+		string basePath = filePath + "missile.png";
+
+		pickup = IMG_LoadTexture(renderer, basePath.c_str());
+
+	}
 
 	pickupRect.x = x;
 	pickupRect.y = y;

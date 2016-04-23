@@ -526,6 +526,14 @@ int main(int argc, char* argv[]){
 
 	Pickup missilePickup = Pickup(renderer, images_dir.c_str(), 3,600.0f,600.0f);
 
+	Pickup playerLife = Pickup(renderer, images_dir.c_str(), 4, 950.0f, 700.0f);
+	Pickup playerLife1 = Pickup(renderer, images_dir.c_str(), 4, 875.0f, 700.0f);
+	Pickup playerLife2 = Pickup(renderer, images_dir.c_str(), 4, 800.0f, 700.0f);
+
+	Pickup missile = Pickup(renderer, images_dir.c_str(), 5, 50.0f, 700.0f);
+	Pickup missile1 = Pickup(renderer, images_dir.c_str(), 5, 100.0f, 700.0f);
+	Pickup missile2 = Pickup(renderer, images_dir.c_str(), 5, 150.0f, 700.0f);
+
 	SDL_GameController* gGameController = NULL;
 
 	gGameController = SDL_GameControllerOpen(0);
@@ -803,7 +811,7 @@ int main(int argc, char* argv[]){
 
 									player1.bulletList[i].Reset();
 
-									player1.playerScore +=1000;
+									player1.playerScore +=500;
 								}
 
 								if(SDL_HasIntersection(&turret1.baseRect, &player1.bulletList[i].posRect))
@@ -851,7 +859,7 @@ int main(int argc, char* argv[]){
 
 									player1.missileList[i].Reset();
 
-									player1.playerScore +=1000;
+									player1.playerScore +=500;
 								}
 
 								if(SDL_HasIntersection(&turret1.baseRect, &player1.missileList[i].posRect))
@@ -901,7 +909,7 @@ int main(int argc, char* argv[]){
 
 									player1.beamList[i].Reset();
 
-									player1.playerScore +=1000;
+									player1.playerScore +=500;
 								}
 
 								if(SDL_HasIntersection(&turret1.baseRect, &player1.beamList[i].posRect))
@@ -1045,15 +1053,13 @@ int main(int argc, char* argv[]){
 					enemyList[i].Draw(renderer);
 				}
 
-				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
-
 				player1.Draw(renderer);
 
 				turret1.Draw(renderer);
 
 				turret2.Draw(renderer);
 
-				if(player1.playerScore >= 200)
+				if(player1.playerScore >= 2000)
 				{
 					gauge1.pickupRect.x = 200;
 					gauge1.pickupRect.y = 500;
@@ -1065,7 +1071,7 @@ int main(int argc, char* argv[]){
 						gauge1.Draw(renderer);
 				}
 
-				if(player1.playerScore >= 400)
+				if(player1.playerScore >= 4000)
 				{
 
 					if(havegaugeFill2)
@@ -1075,7 +1081,7 @@ int main(int argc, char* argv[]){
 						gauge2.Draw(renderer);
 				}
 
-				if(player1.playerScore >= 600)
+				if(player1.playerScore >= 6000)
 				{
 					if(havegaugeFill3)
 					SDL_RenderCopy(renderer, gaugeFill3, NULL, &gaugeFill3Pos);
@@ -1106,6 +1112,36 @@ int main(int argc, char* argv[]){
 
 						explodeList[i].Draw(renderer);
 					}
+				}
+
+				if (player1.playerLives >= 1)
+				{
+					playerLife.Draw(renderer);
+				}
+
+				if (player1.playerLives >= 2)
+				{
+					playerLife1.Draw(renderer);
+				}
+
+				if (player1.playerLives >= 3)
+				{
+					playerLife2.Draw(renderer);
+				}
+
+				if (player1.missiles >= 1)
+				{
+					missile.Draw(renderer);
+				}
+				
+				if (player1.missiles >= 2)
+				{
+					missile1.Draw(renderer);
+				}
+				
+				if (player1.missiles >= 3)
+				{
+					missile2.Draw(renderer);
 				}
 
 				SDL_RenderPresent(renderer);
@@ -1452,8 +1488,6 @@ int main(int argc, char* argv[]){
 
 				SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
 
-				SDL_RenderCopy(renderer, mainmenu, NULL, &menuPos);
-
 				player1.Draw(renderer);
 
 				turret1.Draw(renderer);
@@ -1461,33 +1495,6 @@ int main(int argc, char* argv[]){
 				turret2.Draw(renderer);
 
 				boss.Draw(renderer);
-
-				if (player1.playerScore >= 100)
-				{
-					if (havegaugeFill1)
-						SDL_RenderCopy(renderer, gaugeFill1, NULL, &gaugeFill1Pos);
-
-					if (gauge1.active)
-						gauge1.Draw(renderer);
-				}
-
-				if (player1.playerScore >= 200)
-				{
-					if (havegaugeFill2)
-						SDL_RenderCopy(renderer, gaugeFill2, NULL, &gaugeFill2Pos);
-
-					if (gauge2.active)
-						gauge2.Draw(renderer);
-				}
-
-				if (player1.playerScore >= 300)
-				{
-					if (havegaugeFill3)
-						SDL_RenderCopy(renderer, gaugeFill3, NULL, &gaugeFill3Pos);
-
-					if (gauge3.active)
-						gauge3.Draw(renderer);
-				}
 
 				if (player1.missiles <= 0)
 				{
@@ -1503,6 +1510,36 @@ int main(int argc, char* argv[]){
 					level2 = false;
 					gameState = WIN;
 					break;
+				}
+
+				if (player1.playerLives >= 1)
+				{
+					playerLife.Draw(renderer);
+				}
+
+				if (player1.playerLives >= 2)
+				{
+					playerLife1.Draw(renderer);
+				}
+
+				if (player1.playerLives >= 3)
+				{
+					playerLife2.Draw(renderer);
+				}
+
+				if (player1.missiles >= 1)
+				{
+					missile.Draw(renderer);
+				}
+
+				if (player1.missiles >= 2)
+				{
+					missile1.Draw(renderer);
+				}
+
+				if (player1.missiles >= 3)
+				{
+					missile2.Draw(renderer);
 				}
 
 				SDL_RenderPresent(renderer);

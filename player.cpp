@@ -149,7 +149,7 @@ void Player::UpdateLives(SDL_Renderer *renderer){
 	convert << playerLives;
 	Result = convert.str();
 
-	tempLives = "Player Lives: " + Result;
+	//tempLives = "Player Lives: " + Result;
 
 	if(playerNum == 0){
 
@@ -207,7 +207,7 @@ void Player::UpdateMissiles(SDL_Renderer *renderer){
 	convert << missiles;
 	Result = convert.str();
 
-	tempMissiles = "Missiles: " + Result;
+	//tempMissiles = "Missiles: " + Result;
 
 	if(playerNum == 0){
 
