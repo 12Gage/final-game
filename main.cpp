@@ -54,6 +54,7 @@ string audio_dir = currentWorkingDirectory + "/final-game/";
 #include "pickup.h"
 #include "explode.h"
 #include "bigboss.h"
+#include "enemyTank.h"
 
 vector<Enemy> enemyList;
 
@@ -534,6 +535,10 @@ int main(int argc, char* argv[]){
 	Pickup missile1 = Pickup(renderer, images_dir.c_str(), 5, 100.0f, 700.0f);
 	Pickup missile2 = Pickup(renderer, images_dir.c_str(), 5, 150.0f, 700.0f);
 
+	EnemyTank eTank1 = EnemyTank(renderer, images_dir.c_str(), audio_dir.c_str(), 200.0f, 200.f);
+	EnemyTank eTank2 = EnemyTank(renderer, images_dir.c_str(), audio_dir.c_str(), 400.0f, 200.f);
+	EnemyTank eTank3 = EnemyTank(renderer, images_dir.c_str(), audio_dir.c_str(), 600.0f, 200.f);
+
 	SDL_GameController* gGameController = NULL;
 
 	gGameController = SDL_GameControllerOpen(0);
@@ -701,6 +706,12 @@ int main(int argc, char* argv[]){
 
 			turret2.ResetTurret2();
 
+			eTank1.ResetEnemy1();
+
+			eTank2.ResetEnemy2();
+
+			eTank3.ResetEnemy3();
+
 			gauge1.active = true;
 
 			for(int i = 0; i < player1.bulletList.size(); i++)
@@ -730,7 +741,7 @@ int main(int argc, char* argv[]){
 
 			startgame = true;
 
-			for(int i = 0; i < 3; i++)
+			for(int i = 0; i < 4; i++)
 			{
 				Enemy tmpEnemy(renderer, images_dir);
 
@@ -788,6 +799,12 @@ int main(int argc, char* argv[]){
 
 				turret2.Update(deltaTime, player1.posRect);
 
+				eTank1.Update(deltaTime, player1.posRect);
+
+				eTank2.Update(deltaTime, player1.posRect);
+
+				eTank3.Update(deltaTime, player1.posRect);
+
 				if(player1.active == true)
 				{
 					for(int i = 0; i < enemyList.size(); i++)
@@ -814,11 +831,50 @@ int main(int argc, char* argv[]){
 									player1.playerScore +=500;
 								}
 
+								if (SDL_HasIntersection(&eTank1.eTankRect, &player1.bulletList[i].posRect))
+								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(eTank1.eTankRect.x, eTank1.eTankRect.y);
+
+									eTank1.Reset();
+
+									player1.bulletList[i].Reset();
+
+									player1.playerScore += 100;
+								}
+
+								if (SDL_HasIntersection(&eTank2.eTankRect, &player1.bulletList[i].posRect))
+								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(eTank2.eTankRect.x, eTank2.eTankRect.y);
+
+									eTank2.Reset();
+
+									player1.bulletList[i].Reset();
+
+									player1.playerScore += 100;
+								}
+
+								if (SDL_HasIntersection(&eTank3.eTankRect, &player1.bulletList[i].posRect))
+								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(eTank3.eTankRect.x, eTank3.eTankRect.y);
+
+									eTank3.Reset();
+
+									player1.bulletList[i].Reset();
+
+									player1.playerScore += 100;
+								}
+
 								if(SDL_HasIntersection(&turret1.baseRect, &player1.bulletList[i].posRect))
 								{
 									Mix_PlayChannel(-1, explosionSound, 0);
 
-									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+									MakeExplosion(turret1.baseRect.x, turret1.baseRect.y);
 
 									player1.bulletList[i].Reset();
 									if(turret1.active == true)
@@ -831,7 +887,7 @@ int main(int argc, char* argv[]){
 								{
 									Mix_PlayChannel(-1, explosionSound, 0);
 
-									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+									MakeExplosion(turret2.baseRect.x, turret2.baseRect.y);
 
 									player1.bulletList[i].Reset();
 									if(turret2.active == true)
@@ -862,11 +918,50 @@ int main(int argc, char* argv[]){
 									player1.playerScore +=500;
 								}
 
+								if (SDL_HasIntersection(&eTank1.eTankRect, &player1.missileList[i].posRect))
+								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(eTank1.eTankRect.x, eTank1.eTankRect.y);
+
+									eTank1.Reset();
+
+									player1.missileList[i].Reset();
+
+									player1.playerScore += 500;
+								}
+
+								if (SDL_HasIntersection(&eTank2.eTankRect, &player1.missileList[i].posRect))
+								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(eTank2.eTankRect.x, eTank2.eTankRect.y);
+
+									eTank2.Reset();
+
+									player1.missileList[i].Reset();
+
+									player1.playerScore += 500;
+								}
+
+								if (SDL_HasIntersection(&eTank3.eTankRect, &player1.missileList[i].posRect))
+								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(eTank3.eTankRect.x, eTank3.eTankRect.y);
+
+									eTank3.Reset();
+
+									player1.missileList[i].Reset();
+
+									player1.playerScore += 500;
+								}
+
 								if(SDL_HasIntersection(&turret1.baseRect, &player1.missileList[i].posRect))
 								{
 									Mix_PlayChannel(-1, explosionSound, 0);
 
-									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+									MakeExplosion(turret1.baseRect.x, turret1.baseRect.y);
 
 									player1.missileList[i].Reset();
 
@@ -880,7 +975,7 @@ int main(int argc, char* argv[]){
 								{
 									Mix_PlayChannel(-1, explosionSound, 0);
 
-									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+									MakeExplosion(turret2.baseRect.x, turret2.baseRect.y);
 
 									player1.missileList[i].Reset();
 
@@ -912,11 +1007,50 @@ int main(int argc, char* argv[]){
 									player1.playerScore +=500;
 								}
 
+								if (SDL_HasIntersection(&eTank1.eTankRect, &player1.beamList[i].posRect))
+								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(eTank1.eTankRect.x, eTank1.eTankRect.y);
+
+									eTank1.Reset();
+
+									player1.beamList[i].Reset();
+
+									player1.playerScore += 500;
+								}
+
+								if (SDL_HasIntersection(&eTank2.eTankRect, &player1.beamList[i].posRect))
+								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(eTank2.eTankRect.x, eTank2.eTankRect.y);
+
+									eTank2.Reset();
+
+									player1.beamList[i].Reset();
+
+									player1.playerScore += 500;
+								}
+
+								if (SDL_HasIntersection(&eTank3.eTankRect, &player1.beamList[i].posRect))
+								{
+									Mix_PlayChannel(-1, explosionSound, 0);
+
+									MakeExplosion(eTank3.eTankRect.x, eTank3.eTankRect.y);
+
+									eTank3.Reset();
+
+									player1.beamList[i].Reset();
+
+									player1.playerScore += 500;
+								}
+
 								if(SDL_HasIntersection(&turret1.baseRect, &player1.beamList[i].posRect))
 								{
 									Mix_PlayChannel(-1, explosionSound, 0);
 
-									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+									MakeExplosion(turret1.baseRect.x, turret1.baseRect.y);
 
 									player1.beamList[i].Reset();
 
@@ -930,7 +1064,7 @@ int main(int argc, char* argv[]){
 								{
 									Mix_PlayChannel(-1, explosionSound, 0);
 
-									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+									MakeExplosion(turret2.baseRect.x, turret2.baseRect.y);
 
 									player1.missileList[i].Reset();
 
@@ -964,6 +1098,57 @@ int main(int argc, char* argv[]){
 								break;
 							}
 						}
+					}
+				}
+				
+				if (SDL_HasIntersection(&player1.posRect, &eTank1.eTankRect)) {
+					Mix_PlayChannel(-1, explosionSound, 0);
+
+					MakeExplosion(player1.posRect.x - 32, player1.posRect.y - 32);
+
+					eTank3.Reset();
+
+					player1.playerLives -= 1;
+
+					if (player1.playerLives <= 0)
+					{
+						startgame = false;
+						gameState = LOSE;
+						break;
+					}
+				}
+
+				if (SDL_HasIntersection(&player1.posRect, &eTank2.eTankRect)) {
+					Mix_PlayChannel(-1, explosionSound, 0);
+
+					MakeExplosion(player1.posRect.x - 32, player1.posRect.y - 32);
+
+					eTank3.Reset();
+
+					player1.playerLives -= 1;
+
+					if (player1.playerLives <= 0)
+					{
+						startgame = false;
+						gameState = LOSE;
+						break;
+					}
+				}
+
+				if (SDL_HasIntersection(&player1.posRect, &eTank3.eTankRect)) {
+					Mix_PlayChannel(-1, explosionSound, 0);
+
+					MakeExplosion(player1.posRect.x - 32, player1.posRect.y - 32);
+
+					eTank3.Reset();
+
+					player1.playerLives -= 1;
+
+					if (player1.playerLives <= 0)
+					{
+						startgame = false;
+						gameState = LOSE;
+						break;
 					}
 				}
 
@@ -1144,6 +1329,10 @@ int main(int argc, char* argv[]){
 					missile2.Draw(renderer);
 				}
 
+				eTank1.Draw(renderer);
+				eTank2.Draw(renderer);
+				eTank3.Draw(renderer);
+
 				SDL_RenderPresent(renderer);
 			}
 			break;
@@ -1250,7 +1439,7 @@ int main(int argc, char* argv[]){
 								{
 									Mix_PlayChannel(-1, explosionSound, 0);
 
-									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+									MakeExplosion(turret1.baseRect.x, turret1.baseRect.y);
 
 									player1.bulletList[i].Reset();
 
@@ -1264,7 +1453,7 @@ int main(int argc, char* argv[]){
 								{
 									Mix_PlayChannel(-1, explosionSound, 0);
 
-									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+									MakeExplosion(turret2.baseRect.x, turret2.baseRect.y);
 
 									player1.bulletList[i].Reset();
 
@@ -1278,7 +1467,7 @@ int main(int argc, char* argv[]){
 								{
 									Mix_PlayChannel(-1, explosionSound, 0);
 
-									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+									MakeExplosion(boss.baseRect.x, boss.baseRect.y);
 
 									player1.bulletList[i].Reset();
 
@@ -1301,7 +1490,7 @@ int main(int argc, char* argv[]){
 								{
 									Mix_PlayChannel(-1, explosionSound, 0);
 
-									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+									MakeExplosion(turret1.baseRect.x, turret1.baseRect.y);
 
 									player1.missileList[i].Reset();
 
@@ -1315,7 +1504,7 @@ int main(int argc, char* argv[]){
 								{
 									Mix_PlayChannel(-1, explosionSound, 0);
 
-									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+									MakeExplosion(turret2.baseRect.x, turret2.baseRect.y);
 
 									player1.missileList[i].Reset();
 
@@ -1329,7 +1518,7 @@ int main(int argc, char* argv[]){
 								{
 									Mix_PlayChannel(-1, explosionSound, 0);
 
-									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+									MakeExplosion(boss.baseRect.x, boss.baseRect.y);
 
 									player1.missileList[i].Reset();
 
@@ -1352,7 +1541,7 @@ int main(int argc, char* argv[]){
 								{
 									Mix_PlayChannel(-1, explosionSound, 0);
 
-									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+									MakeExplosion(turret1.baseRect.x, turret1.baseRect.y);
 
 									player1.beamList[i].Reset();
 
@@ -1366,7 +1555,7 @@ int main(int argc, char* argv[]){
 								{
 									Mix_PlayChannel(-1, explosionSound, 0);
 
-									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+									MakeExplosion(turret2.baseRect.x, turret2.baseRect.y);
 
 									player1.beamList[i].Reset();
 
@@ -1381,7 +1570,7 @@ int main(int argc, char* argv[]){
 								{
 									Mix_PlayChannel(-1, explosionSound, 0);
 
-									MakeExplosion(enemyList[j].posRect.x, enemyList[j].posRect.y);
+									MakeExplosion(boss.baseRect.x, boss.baseRect.y);
 
 									player1.beamList[i].Reset();
 
@@ -1482,6 +1671,14 @@ int main(int argc, char* argv[]){
 					player1.missiles = 3;
 				}
 
+				for (int i = 0; i < explodeList.size(); i++)
+				{
+					if (explodeList[i].active == true) {
+
+						explodeList[i].Update(deltaTime);
+					}
+				}
+
 				SDL_RenderClear(renderer);
 
 				SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
@@ -1540,6 +1737,14 @@ int main(int argc, char* argv[]){
 				if (player1.missiles >= 3)
 				{
 					missile2.Draw(renderer);
+				}
+
+				for (int i = 0; i < explodeList.size(); i++)
+				{
+					if (explodeList[i].active == true) {
+
+						explodeList[i].Draw(renderer);
+					}
 				}
 
 				SDL_RenderPresent(renderer);
